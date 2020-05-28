@@ -1,0 +1,238 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noodp"><meta http-equiv=x-ua-compatible content="IE=edge, chrome=1"><title>多集群管理 - LoveIt</title><meta name=Description content="关于 LoveIt 主题"><meta property="og:title" content="多集群管理"><meta property="og:description" content="在多个集群中部署和管理应用，能带来更好的故障隔离性和扩展性。Istio 的多集群模型主要分为两类：多控制面模型和单控制面模型。 由于多控制面模型"><meta property="og:type" content="article"><meta property="og:url" content="https://garroshh.me/%E5%A4%9A%E9%9B%86%E7%BE%A4%E7%AE%A1%E7%90%86/"><meta property="og:image" content="https://garroshh.me/logo.png"><meta property="article:published_time" content="2020-05-14T11:47:35+08:00"><meta property="article:modified_time" content="2020-05-14T11:47:35+08:00"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://garroshh.me/logo.png"><meta name=twitter:title content="多集群管理"><meta name=twitter:description content="在多个集群中部署和管理应用，能带来更好的故障隔离性和扩展性。Istio 的多集群模型主要分为两类：多控制面模型和单控制面模型。 由于多控制面模型"><meta name=application-name content="LoveIt"><meta name=apple-mobile-web-app-title content="LoveIt"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://garroshh.me/%E5%A4%9A%E9%9B%86%E7%BE%A4%E7%AE%A1%E7%90%86/><link rel=prev href=https://garroshh.me/%E6%9C%8D%E5%8A%A1%E4%BF%9D%E6%8A%A4/><link rel=next href=https://garroshh.me/%E5%AE%9E%E9%AA%8C%E6%80%BB%E7%BB%93/><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css><link rel=stylesheet href=/css/style.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/animate.css@3.7.2/animate.min.css><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"多集群管理","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/garroshh.me\/%E5%A4%9A%E9%9B%86%E7%BE%A4%E7%AE%A1%E7%90%86\/"},"image":{"@type":"ImageObject","url":"https:\/\/garroshh.me\/cover.png","width":800,"height":600},"genre":"posts","keywords":"Istio, 实验","wordcount":1646,"url":"https:\/\/garroshh.me\/%E5%A4%9A%E9%9B%86%E7%BE%A4%E7%AE%A1%E7%90%86\/","datePublished":"2020-05-14T11:47:35+08:00","dateModified":"2020-05-14T11:47:35+08:00","license":"This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher":{"@type":"Organization","name":"xxxx","logo":{"@type":"ImageObject","url":"https:\/\/garroshh.me\/logo.png","width":127,"height":40}},"author":{"@type":"Person","name":"garroshh"},"description":""}</script></head><body header-desktop=fixed header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem('theme')?localStorage.getItem('theme')==='dark':('auto'==='auto'?window.matchMedia('(prefers-color-scheme: dark)').matches:'auto'==='dark'))&&document.body.setAttribute('theme','dark');</script><div id=mask></div><div class=wrapper><header class=desktop id=header-desktop><div class=header-wrapper><div class=header-title><a href=/ title=LoveIt><span class=header-title-pre><i class="far fa-kiss-wink-heart fa-fw"></i></span><span id=id-1 class=typeit></span></a></div><div class=menu><div class=menu-inner><a class=menu-item href=/posts/>所有文章 </a><a class=menu-item href=/tags/>标签 </a><a class=menu-item href=/categories/>分类 </a><a class=menu-item href=/categories/documentation/>文档 </a><a class=menu-item href=/about/>关于 </a><a class=menu-item href=https://github.com/dillonzq/LoveIt title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i></a><span class="menu-item delimiter"></span><a href=javascript:void(0); class="menu-item language" title=选择语言>简体中文<i class="fas fa-chevron-right fa-fw"></i>
+<select class=language-select id=language-select-desktop onchange="location=this.value;"><option value=/%E5%A4%9A%E9%9B%86%E7%BE%A4%E7%AE%A1%E7%90%86/ selected>简体中文</option></select>
+</a><span class="menu-item search" id=search-desktop><input type=text placeholder=搜索文章标题或内容... id=search-input-desktop>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-desktop title=搜索><i class="fas fa-search fa-fw"></i></a><a href=javascript:void(0); class="search-button search-clear" id=search-clear-desktop title=清空><i class="fas fa-times-circle fa-fw"></i></a><span class="search-button search-loading" id=search-loading-desktop><i class="fas fa-spinner fa-fw fa-spin"></i></span></span><a href=javascript:void(0); class="menu-item theme-switch" title=切换主题><i class="fas fa-adjust fa-fw"></i></a></div></div></div></header><header class=mobile id=header-mobile><div class=header-container><div class=header-wrapper><div class=header-title><a href=/ title=LoveIt><span class=header-title-pre><i class="far fa-kiss-wink-heart fa-fw"></i></span><span id=id-2 class=typeit></span></a></div><div class=menu-toggle id=menu-toggle-mobile><span></span><span></span><span></span></div></div><div class=menu id=menu-mobile><div class=search-wrapper><div class="search mobile" id=search-mobile><input type=text placeholder=搜索文章标题或内容... id=search-input-mobile>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-mobile title=搜索><i class="fas fa-search fa-fw"></i></a><a href=javascript:void(0); class="search-button search-clear" id=search-clear-mobile title=清空><i class="fas fa-times-circle fa-fw"></i></a><span class="search-button search-loading" id=search-loading-mobile><i class="fas fa-spinner fa-fw fa-spin"></i></span></div><a href=javascript:void(0); class=search-cancel id=search-cancel-mobile>取消</a></div><a class=menu-item href=/posts/>所有文章</a><a class=menu-item href=/tags/>标签</a><a class=menu-item href=/categories/>分类</a><a class=menu-item href=/categories/documentation/>文档</a><a class=menu-item href=/about/>关于</a><a class=menu-item href=https://github.com/dillonzq/LoveIt title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i></a><a href=javascript:void(0); class="menu-item theme-switch" title=切换主题>
+<i class="fas fa-adjust fa-fw"></i></a><a href=javascript:void(0); class=menu-item title=选择语言>简体中文<i class="fas fa-chevron-right fa-fw"></i>
+<select class=language-select onchange="location=this.value;"><option value=/%E5%A4%9A%E9%9B%86%E7%BE%A4%E7%AE%A1%E7%90%86/ selected>简体中文</option></select></a></div></div></header><div class="search-dropdown desktop"><div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile"><div id=search-dropdown-mobile></div></div><main class=main><div class=container><div class=toc id=toc-auto><h2 class=toc-title>目录</h2><div class=toc-content id=toc-content-auto></div></div><article class="page single"><h1 class="single-title animated flipInX">多集群管理</h1><div class=post-meta><div class=post-meta-line><span class=post-author><a href=garroshh.me title=Author rel=author class=author><i class="fas fa-user-circle fa-fw"></i>garroshh</a></span>&nbsp;<span class=post-category>收录于 <a href=/categories/istio/><i class="far fa-folder fa-fw"></i>Istio</a></span></div><div class=post-meta-line><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime=2020-05-14>2020-05-14</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 1646 字&nbsp;
+<i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 4 分钟&nbsp;</div></div><div class="details toc" id=toc-static kept><div class="details-summary toc-title"><span>目录</span>
+<span><i class="details-icon fas fa-angle-right"></i></span></div><div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents></nav></div></div><div class=content id=content><p>在多个集群中部署和管理应用，能带来更好的故障隔离性和扩展性。Istio 的多集群模型主要分为两类：多控制面模型和单控制面模型。</p><p>由于多控制面模型存在配置规则复杂等问题，而在集群间使用 VPN 直连的单控制面模型对网络的连通性又有较高的要求。所以如下实验</p><p>演示单控制平面服务路由的感知方案，这种方案不要求网络扁平，只要求 Pilot 可以访问所有集群的 Kube-apiserver。</p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200514114822145.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200514114822145.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200514114822145.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200514114822145.png 2x" data-sizes=auto alt=image-20200514114822145 title=image-20200514114822145></p><h1 id=1-实验目标>1. 实验目标</h1><p>在两个不同的集群中分别部署同一个服务 helloworld 的不同实例：helloworld-v1 和 helloworld-v2，从客户端程序 sleep 内访问 helloworld</p><p>服务的流量能够被路由到两个集群的不同实例。</p><h1 id=2-实验演练>2. 实验演练：</h1><p>（一）环境准备</p><p>（1）准备两个 kubernetes 集群：cluster1 和 cluster2，其中 cluster1 是主集群，即部署 Pilot 等组件的集群：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>kubectl config get-contexts
+</code></pre></td></tr></table></div></div><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514135806109.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514135806109.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514135806109.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514135806109.png 2x" data-sizes=auto alt=image-20200514135806109 title=image-20200514135806109></p><p>（2）存储集群名称到环境变量：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash><span class=nb>export</span> <span class=nv>CTX_CLUSTER1</span><span class=o>=</span><span class=k>$(</span>kubectl config view -o <span class=nv>jsonpath</span><span class=o>=</span><span class=s1>&#39;{.contexts[0].name}&#39;</span><span class=k>)</span>
+<span class=nb>export</span> <span class=nv>CTX_CLUSTER2</span><span class=o>=</span><span class=k>$(</span>kubectl config view -o <span class=nv>jsonpath</span><span class=o>=</span><span class=s1>&#39;{.contexts[1].name}&#39;</span><span class=k>)</span>
+<span class=nb>echo</span> <span class=nv>CTX_CLUSTER1</span> <span class=o>=</span> <span class=si>${</span><span class=nv>CTX_CLUSTER1</span><span class=si>}</span>, <span class=nv>CTX_CLUSTER2</span> <span class=o>=</span> <span class=si>${</span><span class=nv>CTX_CLUSTER2</span><span class=si>}</span>
+</code></pre></td></tr></table></div></div><p>（二）主集群配置：</p><p>（1）部署 Istio 到 cluster1：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>kubectl create --context<span class=o>=</span><span class=nv>$CTX_CLUSTER1</span> ns istio-system
+kubectl create --context<span class=o>=</span><span class=nv>$CTX_CLUSTER1</span> secret generic cacerts -n istio-system --from-file<span class=o>=</span>samples/certs/ca-cert.pem --from-file<span class=o>=</span>samples/certs/ca-key.pem --from-file<span class=o>=</span>samples/certs/root-cert.pem --from-file<span class=o>=</span>samples/certs/cert-chain.pem
+istioctl manifest apply --context<span class=o>=</span><span class=nv>$CTX_CLUSTER1</span> <span class=se>\
+</span><span class=se></span>-f install/kubernetes/operator/examples/multicluster/values-istio-multicluster-primary.yaml
+</code></pre></td></tr></table></div></div><p>查看部署：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>kubectl get pods --context<span class=o>=</span><span class=nv>$CTX_CLUSTER1</span> -n istio-system
+</code></pre></td></tr></table></div></div><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514135829046.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514135829046.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514135829046.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514135829046.png 2x" data-sizes=auto alt=image-20200514135829046 title=image-20200514135829046></p><p>（2）创建一个入口网关使 cluster2 的服务可以进人 cluster1：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>kubectl apply --context<span class=o>=</span><span class=nv>$CTX_CLUSTER1</span> -f - <span class=s>&lt;&lt;EOF
+</span><span class=s>apiVersion: networking.istio.io/v1alpha3
+</span><span class=s>kind: Gateway
+</span><span class=s>metadata:
+</span><span class=s>name: cluster-aware-gateway
+</span><span class=s>namespace: istio-system
+</span><span class=s>spec:
+</span><span class=s>selector:
+</span><span class=s>istio: ingressgateway
+</span><span class=s>servers:
+</span><span class=s>- port:
+</span><span class=s>number: 443
+</span><span class=s>name: tls
+</span><span class=s>protocol: TLS
+</span><span class=s>tls:
+</span><span class=s>mode: AUTO_PASSTHROUGH
+</span><span class=s>hosts:
+</span><span class=s>- &#34;*.local&#34;
+</span><span class=s>EOF</span>
+</code></pre></td></tr></table></div></div><p>（3）确定 cluster1 的入口 IP 和端口：</p><p>1.将kubectl的当前上下文设置为CTX_CLUSTER1</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash><span class=nb>export</span> <span class=nv>ORIGINAL_CONTEXT</span><span class=o>=</span><span class=k>$(</span>kubectl config current-context<span class=k>)</span>
+kubectl config use-context <span class=nv>$CTX_CLUSTER1</span>
+</code></pre></td></tr></table></div></div><p>2.确定入口 IP 和 端口：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash><span class=nb>export</span> <span class=nv>INGRESS_PORT</span><span class=o>=</span><span class=k>$(</span>kubectl -n istio-system get service istio-ingressgateway -o <span class=nv>jsonpath</span><span class=o>=</span><span class=s1>&#39;{.spec.ports[?(@.name==&#34;http2&#34;)].nodePort}&#39;</span><span class=k>)</span>
+<span class=nb>export</span> <span class=nv>SECURE_INGRESS_PORT</span><span class=o>=</span><span class=k>$(</span>kubectl -n istio-system get service istio-ingressgateway -o <span class=nv>jsonpath</span><span class=o>=</span><span class=s1>&#39;{.spec.ports[?(@.name==&#34;https&#34;)].nodePort}&#39;</span><span class=k>)</span>
+<span class=nb>export</span> <span class=nv>INGRESS_HOST</span><span class=o>=</span><span class=k>$(</span>kubectl get po -l <span class=nv>istio</span><span class=o>=</span>ingressgateway -n istio-system -o <span class=nv>jsonpath</span><span class=o>=</span><span class=s1>&#39;{.items[0].status.hostIP}&#39;</span><span class=k>)</span>
+</code></pre></td></tr></table></div></div><p>3.恢复以前的kubectl上下文：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>kubectl config use-context <span class=nv>$ORIGINAL_CONTEXT</span>
+<span class=nb>unset</span> ORIGINAL_CONTEXT
+</code></pre></td></tr></table></div></div><p>4.打印 INGRESS_HOST 和 SECURE_INGRESS_PORT 的值：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash><span class=nb>echo</span> The ingress gateway of cluster1: <span class=nv>address</span><span class=o>=</span><span class=nv>$INGRESS_HOST</span>, <span class=nv>port</span><span class=o>=</span><span class=nv>$SECURE_INGRESS_PORT</span>
+</code></pre></td></tr></table></div></div><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514135859383.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514135859383.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514135859383.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514135859383.png 2x" data-sizes=auto alt=image-20200514135859383 title=image-20200514135859383></p><p>（4）在网状网络配置中更新网关地址。编辑istio ConfigMap：注意，该地址显示在两个位置，第二个位于values.yaml：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>kubectl edit cm -n istio-system --context<span class=o>=</span><span class=nv>$CTX_CLUSTER1</span> istio
+</code></pre></td></tr></table></div></div><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514135925286.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514135925286.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514135925286.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514135925286.png 2x" data-sizes=auto alt=image-20200514135925286 title=image-20200514135925286></p><p>（三）部署 cluster2：</p><p>（1）导出 cluster1 网关地址：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash><span class=nb>export</span> <span class=nv>LOCAL_GW_ADDR</span><span class=o>=</span><span class=k>$(</span>kubectl get po -l <span class=nv>istio</span><span class=o>=</span>ingressgateway -n istio-system -o <span class=nv>jsonpath</span><span class=o>=</span><span class=s1>&#39;{.items[0].status.hostIP}&#39;</span><span class=k>)</span> <span class=o>&amp;&amp;</span> <span class=nb>echo</span> <span class=si>${</span><span class=nv>LOCAL_GW_ADDR</span><span class=si>}</span>
+</code></pre></td></tr></table></div></div><p>（2）部署 Istio 到 cluster2：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>kubectl create --context<span class=o>=</span><span class=nv>$CTX_CLUSTER2</span> ns istio-system
+kubectl create --context<span class=o>=</span><span class=nv>$CTX_CLUSTER2</span> secret generic cacerts -n istio-system --from-file<span class=o>=</span>samples/certs/ca-cert.pem --from-file<span class=o>=</span>samples/certs/ca-key.pem --from-file<span class=o>=</span>samples/certs/root-cert.pem --from-file<span class=o>=</span>samples/certs/cert-chain.pem
+<span class=nv>CLUSTER_NAME</span><span class=o>=</span><span class=k>$(</span>kubectl --context<span class=o>=</span><span class=nv>$CTX_CLUSTER2</span> config view --minify<span class=o>=</span><span class=nb>true</span> -o <span class=nv>jsonpath</span><span class=o>=</span><span class=s1>&#39;{.clusters[].name}&#39;</span><span class=k>)</span>
+istioctl manifest apply --context<span class=o>=</span><span class=nv>$CTX_CLUSTER2</span> <span class=se>\
+</span><span class=se></span>--set <span class=nv>profile</span><span class=o>=</span>remote <span class=se>\
+</span><span class=se></span>--set values.global.mtls.enabled<span class=o>=</span><span class=nb>true</span> <span class=se>\
+</span><span class=se></span>--set values.gateways.enabled<span class=o>=</span><span class=nb>true</span> <span class=se>\
+</span><span class=se></span>--set values.security.selfSigned<span class=o>=</span><span class=nb>false</span> <span class=se>\
+</span><span class=se></span>--set values.global.controlPlaneSecurityEnabled<span class=o>=</span><span class=nb>true</span> <span class=se>\
+</span><span class=se></span>--set values.global.createRemoteSvcEndpoints<span class=o>=</span><span class=nb>true</span> <span class=se>\
+</span><span class=se></span>--set values.global.remotePilotCreateSvcEndpoint<span class=o>=</span><span class=nb>true</span> <span class=se>\
+</span><span class=se></span>--set values.global.remotePilotAddress<span class=o>=</span><span class=si>${</span><span class=nv>LOCAL_GW_ADDR</span><span class=si>}</span> <span class=se>\
+</span><span class=se></span>--set values.global.remotePolicyAddress<span class=o>=</span><span class=si>${</span><span class=nv>LOCAL_GW_ADDR</span><span class=si>}</span> <span class=se>\
+</span><span class=se></span>--set values.global.remoteTelemetryAddress<span class=o>=</span><span class=si>${</span><span class=nv>LOCAL_GW_ADDR</span><span class=si>}</span> <span class=se>\
+</span><span class=se></span>--set values.gateways.istio-ingressgateway.env.ISTIO_META_NETWORK<span class=o>=</span><span class=s2>&#34;network2&#34;</span> <span class=se>\
+</span><span class=se></span>--set values.global.network<span class=o>=</span><span class=s2>&#34;network2&#34;</span> <span class=se>\
+</span><span class=se></span>--set values.global.multiCluster.clusterName<span class=o>=</span><span class=si>${</span><span class=nv>CLUSTER_NAME</span><span class=si>}</span> <span class=se>\
+</span><span class=se></span>--set autoInjection.enabled<span class=o>=</span><span class=nb>true</span>
+</code></pre></td></tr></table></div></div><p>（3）等待除 istio-ingressgateway 外的cluster2上的Istio Pod准备就绪，注意：将 cluster1 中的 Istio 控制平面配置为监视cluster2之前，istio-ingressgateway才准备就绪。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>kubectl get pods --context<span class=o>=</span><span class=nv>$CTX_CLUSTER2</span> -n istio-system -l istio!<span class=o>=</span>ingressgateway
+</code></pre></td></tr></table></div></div><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514140130635.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514140130635.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514140130635.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514140130635.png 2x" data-sizes=auto alt=image-20200514140130635 title=image-20200514140130635></p><p>（4）确定cluster2的入口IP和端口。</p><p>1.将kubectl的当前上下文设置为CTX_CLUSTER2</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash><span class=nb>export</span> <span class=nv>ORIGINAL_CONTEXT</span><span class=o>=</span><span class=k>$(</span>kubectl config current-context<span class=k>)</span>
+kubectl config use-context <span class=nv>$CTX_CLUSTER2</span>
+</code></pre></td></tr></table></div></div><p>2.确定入口IP和端口</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash><span class=nb>export</span> <span class=nv>INGRESS_PORT</span><span class=o>=</span><span class=k>$(</span>kubectl -n istio-system get service istio-ingressgateway -o <span class=nv>jsonpath</span><span class=o>=</span><span class=s1>&#39;{.spec.ports[?(@.name==&#34;http2&#34;)].nodePort}&#39;</span><span class=k>)</span>
+<span class=nb>export</span> <span class=nv>SECURE_INGRESS_PORT</span><span class=o>=</span><span class=k>$(</span>kubectl -n istio-system get service istio-ingressgateway -o <span class=nv>jsonpath</span><span class=o>=</span><span class=s1>&#39;{.spec.ports[?(@.name==&#34;https&#34;)].nodePort}&#39;</span><span class=k>)</span>
+<span class=nb>export</span> <span class=nv>INGRESS_HOST</span><span class=o>=</span><span class=k>$(</span>kubectl get po -l <span class=nv>istio</span><span class=o>=</span>ingressgateway -n istio-system -o <span class=nv>jsonpath</span><span class=o>=</span><span class=s1>&#39;{.items[0].status.hostIP}&#39;</span><span class=k>)</span>
+</code></pre></td></tr></table></div></div><p>3.恢复以前的 kubectl 上下文</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>kubectl config use-context <span class=nv>$ORIGINAL_CONTEXT</span>
+<span class=nb>unset</span> ORIGINAL_CONTEXT
+</code></pre></td></tr></table></div></div><p>4.打印 INGRESS_HOST 和 SECURE_INGRESS_PORT 的值</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash><span class=nb>echo</span> The ingress gateway of cluster2: <span class=nv>address</span><span class=o>=</span><span class=nv>$INGRESS_HOST</span>, <span class=nv>port</span><span class=o>=</span><span class=nv>$SECURE_INGRESS_PORT</span>
+</code></pre></td></tr></table></div></div><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514140151384.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514140151384.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514140151384.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514140151384.png 2x" data-sizes=auto alt=image-20200514140151384 title=image-20200514140151384></p><p>（5）更新网关地址。编辑istio ConfigMap：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>kubectl edit cm -n istio-system --context<span class=o>=</span><span class=nv>$CTX_CLUSTER1</span> istio
+</code></pre></td></tr></table></div></div><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514140254573.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514140254573.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514140254573.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514140254573.png 2x" data-sizes=auto alt=image-20200514140254573 title=image-20200514140254573></p><p>（6）准备环境变量以为服务帐户istio-reader-service-account构建n2-k8s-config文件：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash><span class=nv>CLUSTER_NAME</span><span class=o>=</span><span class=k>$(</span>kubectl --context<span class=o>=</span><span class=nv>$CTX_CLUSTER2</span> config view --minify<span class=o>=</span><span class=nb>true</span> -o <span class=nv>jsonpath</span><span class=o>=</span><span class=s1>&#39;{.clusters[].name}&#39;</span><span class=k>)</span>
+<span class=nv>SERVER</span><span class=o>=</span><span class=k>$(</span>kubectl --context<span class=o>=</span><span class=nv>$CTX_CLUSTER2</span> config view --minify<span class=o>=</span><span class=nb>true</span> -o <span class=nv>jsonpath</span><span class=o>=</span><span class=s1>&#39;{.clusters[].cluster.server}&#39;</span><span class=k>)</span>
+<span class=nv>SECRET_NAME</span><span class=o>=</span><span class=k>$(</span>kubectl --context<span class=o>=</span><span class=nv>$CTX_CLUSTER2</span> get sa istio-reader-service-account -n istio-system -o <span class=nv>jsonpath</span><span class=o>=</span><span class=s1>&#39;{.secrets[].name}&#39;</span><span class=k>)</span>
+<span class=nv>CA_DATA</span><span class=o>=</span><span class=k>$(</span>kubectl get --context<span class=o>=</span><span class=nv>$CTX_CLUSTER2</span> secret <span class=si>${</span><span class=nv>SECRET_NAME</span><span class=si>}</span> -n istio-system -o <span class=nv>jsonpath</span><span class=o>=</span><span class=s2>&#34;{.data[&#39;ca\.crt&#39;]}&#34;</span><span class=k>)</span>
+<span class=nv>TOKEN</span><span class=o>=</span><span class=k>$(</span>kubectl get --context<span class=o>=</span><span class=nv>$CTX_CLUSTER2</span> secret <span class=si>${</span><span class=nv>SECRET_NAME</span><span class=si>}</span> -n istio-system -o <span class=nv>jsonpath</span><span class=o>=</span><span class=s2>&#34;{.data[&#39;token&#39;]}&#34;</span> <span class=p>|</span> base64 --decode<span class=k>)</span>
+</code></pre></td></tr></table></div></div><p>（7）在 Istio 工作目录中创建n2-k8s-config文件：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-yaml data-lang=yaml>cat<span class=w> </span>&lt;&lt;EOF<span class=w> </span>&gt;<span class=w> </span>n2-k8s-config<span class=w>
+</span><span class=w></span><span class=k>apiVersion</span><span class=p>:</span><span class=w> </span>v1<span class=w>
+</span><span class=w></span><span class=k>kind</span><span class=p>:</span><span class=w> </span>Config<span class=w>
+</span><span class=w></span><span class=k>clusters</span><span class=p>:</span><span class=w>
+</span><span class=w></span>- <span class=k>cluster</span><span class=p>:</span><span class=w>
+</span><span class=w></span><span class=k>certificate-authority-data</span><span class=p>:</span><span class=w> </span>${CA_DATA}<span class=w>
+</span><span class=w></span><span class=k>server</span><span class=p>:</span><span class=w> </span>${SERVER}<span class=w>
+</span><span class=w></span><span class=k>name</span><span class=p>:</span><span class=w> </span>${CLUSTER_NAME}<span class=w>
+</span><span class=w></span><span class=k>contexts</span><span class=p>:</span><span class=w>
+</span><span class=w></span>- <span class=k>context</span><span class=p>:</span><span class=w>
+</span><span class=w></span><span class=k>cluster</span><span class=p>:</span><span class=w> </span>${CLUSTER_NAME}<span class=w>
+</span><span class=w></span><span class=k>user</span><span class=p>:</span><span class=w> </span>${CLUSTER_NAME}<span class=w>
+</span><span class=w></span><span class=k>name</span><span class=p>:</span><span class=w> </span>${CLUSTER_NAME}<span class=w>
+</span><span class=w></span><span class=k>current-context</span><span class=p>:</span><span class=w> </span>${CLUSTER_NAME}<span class=w>
+</span><span class=w></span><span class=k>users</span><span class=p>:</span><span class=w>
+</span><span class=w></span>- <span class=k>name</span><span class=p>:</span><span class=w> </span>${CLUSTER_NAME}<span class=w>
+</span><span class=w></span><span class=k>user</span><span class=p>:</span><span class=w>
+</span><span class=w></span><span class=k>token</span><span class=p>:</span><span class=w> </span>${TOKEN}<span class=w>
+</span><span class=w></span>EOF<span class=w>
+</span></code></pre></td></tr></table></div></div><p>（8）执行以下命令以添加并标记 cluster2 Kubernetes 的秘钥。执行完这些命令后，cluster1 上的 Istio Pilot 将开始监视 cluster2 的服务和实例，就像对 cluster1 一样。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>kubectl create --context<span class=o>=</span><span class=nv>$CTX_CLUSTER1</span> secret generic n2-k8s-secret --from-file n2-k8s-config -n istio-system
+kubectl label --context<span class=o>=</span><span class=nv>$CTX_CLUSTER1</span> secret n2-k8s-secret istio/multiCluster<span class=o>=</span><span class=nb>true</span> -n istio-system
+</code></pre></td></tr></table></div></div><p>等待istio-ingressgateway准备就绪：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>kubectl get pods --context<span class=o>=</span><span class=nv>$CTX_CLUSTER2</span> -n istio-system -l <span class=nv>istio</span><span class=o>=</span>ingressgateway
+</code></pre></td></tr></table></div></div><p>发现一直未就绪：</p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514140338390.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514140338390.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514140338390.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514140338390.png 2x" data-sizes=auto alt=image-20200514140338390 title=image-20200514140338390></p><p>查看 cluster2 ingressgateway 日志：报错找不到 Pilot：</p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514140418675.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514140418675.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514140418675.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514140418675.png 2x" data-sizes=auto alt=image-20200514140418675 title=image-20200514140418675></p><p>查看 cluster1 Pilot 日志：P[ilot 可以感知到 cluser2 上 ingressgateway 的变化：</p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514140517303.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514140517303.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514140517303.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514140517303.png 2x" data-sizes=auto alt=image-20200514140517303 title=image-20200514140517303></p><p>//todo debug 很久很久，一直未发现原因，待后续深入理解交互流程及原理，再来实验。</p><h1 id=3-清理>3. 清理</h1><p>清理 cluster2：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>istioctl manifest generate --context<span class=o>=</span><span class=nv>$CTX_CLUSTER2</span> <span class=se>\
+</span><span class=se></span>  --set <span class=nv>profile</span><span class=o>=</span>remote <span class=se>\
+</span><span class=se></span>  --set values.global.mtls.enabled<span class=o>=</span><span class=nb>true</span> <span class=se>\
+</span><span class=se></span>  --set values.gateways.enabled<span class=o>=</span><span class=nb>true</span> <span class=se>\
+</span><span class=se></span>  --set values.security.selfSigned<span class=o>=</span><span class=nb>false</span> <span class=se>\
+</span><span class=se></span>  --set values.global.controlPlaneSecurityEnabled<span class=o>=</span><span class=nb>true</span> <span class=se>\
+</span><span class=se></span>  --set values.global.createRemoteSvcEndpoints<span class=o>=</span><span class=nb>true</span> <span class=se>\
+</span><span class=se></span>  --set values.global.remotePilotCreateSvcEndpoint<span class=o>=</span><span class=nb>true</span> <span class=se>\
+</span><span class=se></span>  --set values.global.remotePilotAddress<span class=o>=</span><span class=si>${</span><span class=nv>LOCAL_GW_ADDR</span><span class=si>}</span> <span class=se>\
+</span><span class=se></span>  --set values.global.remotePolicyAddress<span class=o>=</span><span class=si>${</span><span class=nv>LOCAL_GW_ADDR</span><span class=si>}</span> <span class=se>\
+</span><span class=se></span>  --set values.global.remoteTelemetryAddress<span class=o>=</span><span class=si>${</span><span class=nv>LOCAL_GW_ADDR</span><span class=si>}</span> <span class=se>\
+</span><span class=se></span>  --set values.gateways.istio-ingressgateway.env.ISTIO_META_NETWORK<span class=o>=</span><span class=s2>&#34;network2&#34;</span> <span class=se>\
+</span><span class=se></span>  --set values.global.network<span class=o>=</span><span class=s2>&#34;network2&#34;</span> <span class=se>\
+</span><span class=se></span>  --set autoInjection.enabled<span class=o>=</span><span class=nb>true</span> <span class=p>|</span> kubectl --context<span class=o>=</span><span class=nv>$CTX_CLUSTER2</span> delete -f -
+kubectl delete --context<span class=o>=</span><span class=nv>$CTX_CLUSTER2</span> ns sample
+<span class=nb>unset</span> CTX_CLUSTER2 CLUSTER_NAME SERVER SECRET_NAME CA_DATA TOKEN INGRESS_HOST SECURE_INGRESS_PORT INGRESS_PORT LOCAL_GW_ADDR
+</code></pre></td></tr></table></div></div><p>清理 cluster1：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>istioctl manifest generate --context<span class=o>=</span><span class=nv>$CTX_CLUSTER1</span> <span class=se>\
+</span><span class=se></span>  -f install/kubernetes/operator/examples/multicluster/values-istio-multicluster-primary.yaml <span class=p>|</span> kubectl --context<span class=o>=</span><span class=nv>$CTX_CLUSTER1</span> delete -f -
+kubectl delete --context<span class=o>=</span><span class=nv>$CTX_CLUSTER1</span> ns sample
+<span class=nb>unset</span> CTX_CLUSTER1
+rm n2-k8s-config
+</code></pre></td></tr></table></div></div></div><div class=post-footer id=post-footer><div class=post-info><div class=post-info-line><div class=post-info-mod><span>更新于 2020-05-14</span></div><div class=post-info-license></div></div><div class=post-info-line><div class=post-info-md></div><div class=post-info-share><span></span></div></div></div><div class=post-info-more><section class=post-tags><i class="fas fa-tags fa-fw"></i>&nbsp;<a href=/tags/istio/>Istio</a>,&nbsp;<a href=/tags/%E5%AE%9E%E9%AA%8C/>实验</a></section><section><span><a href=javascript:void(0); onclick=window.history.back();>返回</a></span>&nbsp;|&nbsp;<span><a href=/>主页</a></span></section></div><div class=post-nav><a href=/%E6%9C%8D%E5%8A%A1%E4%BF%9D%E6%8A%A4/ class=prev rel=prev title=服务保护><i class="fas fa-angle-left fa-fw"></i>服务保护</a>
+<a href=/%E5%AE%9E%E9%AA%8C%E6%80%BB%E7%BB%93/ class=next rel=next title=实验总结>实验总结<i class="fas fa-angle-right fa-fw"></i></a></div></div><div id=comments><div id=gitalk class=comment></div><noscript>Please enable JavaScript to view the comments powered by <a href=https://github.com/gitalk/gitalk></a>Gitalk</a>.</noscript></div></article></div></main><footer class=footer><div class=footer-container><div class=footer-line>由 <a href=https://gohugo.io/ target=_blank rel="noopener noreffer" title="Hugo 0.71.1">Hugo</a> 强力驱动 | 主题 - <a href=https://github.com/dillonzq/LoveIt target=_blank rel="noopener noreffer" title="LoveIt 0.2.9"><i class="far fa-kiss-wink-heart fa-fw"></i>LoveIt</a></div><div class=footer-line><i class="far fa-copyright fa-fw"></i><span itemprop=copyrightYear>2019 - 2020</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=garroshh.me target=_blank>garroshh</a></span>&nbsp;|&nbsp;<span class=license><a rel="license external nofollow noopener noreffer" href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank>CC BY-NC 4.0</a></span></div></div></footer></div><div id=fixed-buttons><a href=# id=back-to-top class=fixed-button title=回到顶部><i class="fas fa-arrow-up fa-fw"></i></a><a href=# id=view-comments class=fixed-button title=查看评论><i class="fas fa-comment fa-fw"></i></a></div><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/gitalk@1.6.2/dist/gitalk.min.css><script type=text/javascript src=https://cdn.jsdelivr.net/npm/gitalk@1.6.2/dist/gitalk.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/smooth-scroll@16.1.3/dist/smooth-scroll.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/autocomplete.js@0.37.1/dist/autocomplete.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/algoliasearch@4.2.0/dist/algoliasearch-lite.umd.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/lazysizes@5.2.0/lazysizes.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/typeit@7.0.4/dist/typeit.min.js></script><script type=text/javascript>window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":10},"comment":{"gitalk":{"admin":["garroshh"],"clientID":"765aeb40ecd9058c4ab8","clientSecret":"824af1ecb35c665e4d7fb379211bb748841e96a1","id":"2020-05-14T11:47:35+08:00","owner":"garroshh","repo":"garroshh.github.io","title":"多集群管理"}},"data":{"id-1":"Garroshh's Blog","id-2":"Garroshh's Blog"},"search":{"algoliaAppID":"PASDMWALPK","algoliaIndex":"index.zh-cn","algoliaSearchKey":"b42948e51daaa93df92381c8e2ac0f93","highlightTag":"em","maxResultLength":10,"noResultsFound":"没有找到结果","snippetLength":50,"type":"algolia"},"typeit":{"cursorChar":"|","cursorSpeed":1000,"data":{"id-1":["id-1"],"id-2":["id-2"]},"duration":-1,"speed":100}};</script><script type=text/javascript src=/js/theme.min.js></script></body></html>

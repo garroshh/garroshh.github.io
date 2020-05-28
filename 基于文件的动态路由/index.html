@@ -1,0 +1,338 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noodp"><meta http-equiv=x-ua-compatible content="IE=edge, chrome=1"><title>基于文件的动态路由 - LoveIt</title><meta name=Description content="关于 LoveIt 主题"><meta property="og:title" content="基于文件的动态路由"><meta property="og:description" content="目标 如何使用 Envoy 提供的基于文件的动态配置 介绍 前面介绍了静态配置，使得在需要更改时很难重新加载配置。使用动态配置，进行更改时，Envoy将自动重"><meta property="og:type" content="article"><meta property="og:url" content="https://garroshh.me/%E5%9F%BA%E4%BA%8E%E6%96%87%E4%BB%B6%E7%9A%84%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1/"><meta property="og:image" content="https://garroshh.me/logo.png"><meta property="article:published_time" content="2020-05-06T11:25:32+08:00"><meta property="article:modified_time" content="2020-05-06T11:25:32+08:00"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://garroshh.me/logo.png"><meta name=twitter:title content="基于文件的动态路由"><meta name=twitter:description content="目标 如何使用 Envoy 提供的基于文件的动态配置 介绍 前面介绍了静态配置，使得在需要更改时很难重新加载配置。使用动态配置，进行更改时，Envoy将自动重"><meta name=application-name content="LoveIt"><meta name=apple-mobile-web-app-title content="LoveIt"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://garroshh.me/%E5%9F%BA%E4%BA%8E%E6%96%87%E4%BB%B6%E7%9A%84%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1/><link rel=prev href=https://garroshh.me/envoy-%E5%89%8D%E7%AB%AF%E4%BB%A3%E7%90%86/><link rel=next href=https://garroshh.me/%E5%9F%BA%E4%BA%8Eapi%E7%9A%84%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1/><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css><link rel=stylesheet href=/css/style.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/animate.css@3.7.2/animate.min.css><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"基于文件的动态路由","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/garroshh.me\/%E5%9F%BA%E4%BA%8E%E6%96%87%E4%BB%B6%E7%9A%84%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1\/"},"image":{"@type":"ImageObject","url":"https:\/\/garroshh.me\/cover.png","width":800,"height":600},"genre":"posts","keywords":"Envoy, 实验","wordcount":793,"url":"https:\/\/garroshh.me\/%E5%9F%BA%E4%BA%8E%E6%96%87%E4%BB%B6%E7%9A%84%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1\/","datePublished":"2020-05-06T11:25:32+08:00","dateModified":"2020-05-06T11:25:32+08:00","license":"This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher":{"@type":"Organization","name":"xxxx","logo":{"@type":"ImageObject","url":"https:\/\/garroshh.me\/logo.png","width":127,"height":40}},"author":{"@type":"Person","name":"garroshh"},"description":""}</script></head><body header-desktop=fixed header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem('theme')?localStorage.getItem('theme')==='dark':('auto'==='auto'?window.matchMedia('(prefers-color-scheme: dark)').matches:'auto'==='dark'))&&document.body.setAttribute('theme','dark');</script><div id=mask></div><div class=wrapper><header class=desktop id=header-desktop><div class=header-wrapper><div class=header-title><a href=/ title=LoveIt><span class=header-title-pre><i class="far fa-kiss-wink-heart fa-fw"></i></span><span id=id-1 class=typeit></span></a></div><div class=menu><div class=menu-inner><a class=menu-item href=/posts/>所有文章 </a><a class=menu-item href=/tags/>标签 </a><a class=menu-item href=/categories/>分类 </a><a class=menu-item href=/categories/documentation/>文档 </a><a class=menu-item href=/about/>关于 </a><a class=menu-item href=https://github.com/dillonzq/LoveIt title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i></a><span class="menu-item delimiter"></span><a href=javascript:void(0); class="menu-item language" title=选择语言>简体中文<i class="fas fa-chevron-right fa-fw"></i>
+<select class=language-select id=language-select-desktop onchange="location=this.value;"><option value=/%E5%9F%BA%E4%BA%8E%E6%96%87%E4%BB%B6%E7%9A%84%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1/ selected>简体中文</option></select>
+</a><span class="menu-item search" id=search-desktop><input type=text placeholder=搜索文章标题或内容... id=search-input-desktop>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-desktop title=搜索><i class="fas fa-search fa-fw"></i></a><a href=javascript:void(0); class="search-button search-clear" id=search-clear-desktop title=清空><i class="fas fa-times-circle fa-fw"></i></a><span class="search-button search-loading" id=search-loading-desktop><i class="fas fa-spinner fa-fw fa-spin"></i></span></span><a href=javascript:void(0); class="menu-item theme-switch" title=切换主题><i class="fas fa-adjust fa-fw"></i></a></div></div></div></header><header class=mobile id=header-mobile><div class=header-container><div class=header-wrapper><div class=header-title><a href=/ title=LoveIt><span class=header-title-pre><i class="far fa-kiss-wink-heart fa-fw"></i></span><span id=id-2 class=typeit></span></a></div><div class=menu-toggle id=menu-toggle-mobile><span></span><span></span><span></span></div></div><div class=menu id=menu-mobile><div class=search-wrapper><div class="search mobile" id=search-mobile><input type=text placeholder=搜索文章标题或内容... id=search-input-mobile>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-mobile title=搜索><i class="fas fa-search fa-fw"></i></a><a href=javascript:void(0); class="search-button search-clear" id=search-clear-mobile title=清空><i class="fas fa-times-circle fa-fw"></i></a><span class="search-button search-loading" id=search-loading-mobile><i class="fas fa-spinner fa-fw fa-spin"></i></span></div><a href=javascript:void(0); class=search-cancel id=search-cancel-mobile>取消</a></div><a class=menu-item href=/posts/>所有文章</a><a class=menu-item href=/tags/>标签</a><a class=menu-item href=/categories/>分类</a><a class=menu-item href=/categories/documentation/>文档</a><a class=menu-item href=/about/>关于</a><a class=menu-item href=https://github.com/dillonzq/LoveIt title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i></a><a href=javascript:void(0); class="menu-item theme-switch" title=切换主题>
+<i class="fas fa-adjust fa-fw"></i></a><a href=javascript:void(0); class=menu-item title=选择语言>简体中文<i class="fas fa-chevron-right fa-fw"></i>
+<select class=language-select onchange="location=this.value;"><option value=/%E5%9F%BA%E4%BA%8E%E6%96%87%E4%BB%B6%E7%9A%84%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1/ selected>简体中文</option></select></a></div></div></header><div class="search-dropdown desktop"><div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile"><div id=search-dropdown-mobile></div></div><main class=main><div class=container><div class=toc id=toc-auto><h2 class=toc-title>目录</h2><div class=toc-content id=toc-content-auto></div></div><article class="page single"><h1 class="single-title animated flipInX">基于文件的动态路由</h1><div class=post-meta><div class=post-meta-line><span class=post-author><a href=garroshh.me title=Author rel=author class=author><i class="fas fa-user-circle fa-fw"></i>garroshh</a></span>&nbsp;<span class=post-category>收录于 <a href=/categories/envoy/><i class="far fa-folder fa-fw"></i>Envoy</a></span></div><div class=post-meta-line><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime=2020-05-06>2020-05-06</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 793 字&nbsp;
+<i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 2 分钟&nbsp;</div></div><div class="details toc" id=toc-static kept><div class="details-summary toc-title"><span>目录</span>
+<span><i class="details-icon fas fa-angle-right"></i></span></div><div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents><ul><li><ul><li><a href=#启动-envoy>启动 Envoy</a></li><li><a href=#启动上游服务>启动上游服务</a></li></ul></li></ul><ul><li><ul><li><a href=#访问-envoy>访问 Envoy</a></li><li><a href=#更改-lds-路由配置>更改 lds 路由配置</a></li></ul></li></ul></nav></div></div><div class=content id=content><h1 id=目标>目标</h1><p>如何使用 Envoy 提供的基于文件的动态配置</p><h1 id=介绍>介绍</h1><p>前面介绍了静态配置，使得在需要更改时很难重新加载配置。使用动态配置，进行更改时，Envoy将自动重新加载更改并将其应用于配置和流量路由。</p><p>Envoy supports different parts of the configuration as dynamic. The APIs available are:</p><ul><li><strong>EDS</strong>: The Endpoint Discovery Service (EDS) API provides a way Envoy can discover members of an upstream cluster. This allows you to dynamically add and remove servers handling the traffic.</li><li><strong>CDS</strong>: The Cluster Discovery Service (CDS) API layers on a mechanism by which Envoy can discover upstream clusters used during routing.</li><li><strong>RDS</strong>: The Route Discovery Service (RDS) API layers on a mechanism by which Envoy can discover the entire route configuration for an HTTP connection manager filter at runtime. This would enable concepts such as dynamically changing traffic shifting and blue/green releases.</li><li><strong>LDS</strong>: The Listener Discovery Service (LDS) layers on a mechanism by which Envoy can discover entire listeners at runtime.</li><li><strong>SDS</strong>: The Secret Discovery Service (SDS) layers on a mechanism by which Envoy can discover cryptographic secrets (certificate plus private key, TLS session ticket keys) for its listeners, as well as the configuration of peer certificate validation logic (trusted root certs, revocations, etc).</li></ul><p>The value for configuration can come from the filesystem, REST-JSON or gRPC endpoints.</p><h1 id=配置>配置</h1><p>envoy.yaml</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-yaml data-lang=yaml><span class=k>node</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span><span class=k>id</span><span class=p>:</span><span class=w> </span>id_1<span class=w>
+</span><span class=w>  </span><span class=k>cluster</span><span class=p>:</span><span class=w> </span>test<span class=w>
+</span><span class=w> 
+</span><span class=w></span><span class=k>admin</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span><span class=k>access_log_path</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;/dev/null&#34;</span><span class=w>
+</span><span class=w>  </span><span class=k>address</span><span class=p>:</span><span class=w>
+</span><span class=w>    </span><span class=k>socket_address</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span><span class=k>address</span><span class=p>:</span><span class=w> </span><span class=m>0.0.0.0</span><span class=w>
+</span><span class=w>      </span><span class=k>port_value</span><span class=p>:</span><span class=w> </span><span class=m>9901</span><span class=w>
+</span><span class=w> 
+</span><span class=w></span><span class=k>dynamic_resources</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span><span class=k>cds_config</span><span class=p>:</span><span class=w>
+</span><span class=w>    </span><span class=k>path</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;/etc/envoy/cds.conf&#34;</span><span class=w>
+</span><span class=w>  </span><span class=k>lds_config</span><span class=p>:</span><span class=w>
+</span><span class=w>    </span><span class=k>path</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;/etc/envoy/lds.conf&#34;</span><span class=w>
+</span></code></pre></td></tr></table></div></div><p>lds.conf</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-json data-lang=json><span class=p>{</span>
+    <span class=nt>&#34;version_info&#34;</span><span class=p>:</span> <span class=s2>&#34;0&#34;</span><span class=p>,</span>
+    <span class=nt>&#34;resources&#34;</span><span class=p>:</span> <span class=p>[{</span>
+            <span class=nt>&#34;@type&#34;</span><span class=p>:</span> <span class=s2>&#34;type.googleapis.com/envoy.api.v2.Listener&#34;</span><span class=p>,</span>
+            <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;listener_0&#34;</span><span class=p>,</span>
+            <span class=nt>&#34;address&#34;</span><span class=p>:</span> <span class=p>{</span>
+                <span class=nt>&#34;socket_address&#34;</span><span class=p>:</span> <span class=p>{</span>
+                    <span class=nt>&#34;address&#34;</span><span class=p>:</span> <span class=s2>&#34;0.0.0.0&#34;</span><span class=p>,</span>
+                    <span class=nt>&#34;port_value&#34;</span><span class=p>:</span> <span class=mi>10000</span>
+                <span class=p>}</span>
+            <span class=p>},</span>
+            <span class=nt>&#34;filter_chains&#34;</span><span class=p>:</span> <span class=p>[</span>
+                <span class=p>{</span>
+                    <span class=nt>&#34;filters&#34;</span><span class=p>:</span> <span class=p>[</span>
+                        <span class=p>{</span>
+                            <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;envoy.http_connection_manager&#34;</span><span class=p>,</span>
+                            <span class=nt>&#34;config&#34;</span><span class=p>:</span> <span class=p>{</span>
+                                <span class=nt>&#34;stat_prefix&#34;</span><span class=p>:</span> <span class=s2>&#34;ingress_http&#34;</span><span class=p>,</span>
+                                <span class=nt>&#34;codec_type&#34;</span><span class=p>:</span> <span class=s2>&#34;AUTO&#34;</span><span class=p>,</span>
+                                <span class=nt>&#34;route_config&#34;</span><span class=p>:</span> <span class=p>{</span>
+                                    <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;local_route&#34;</span><span class=p>,</span>
+                                    <span class=nt>&#34;virtual_hosts&#34;</span><span class=p>:</span> <span class=p>[</span>
+                                        <span class=p>{</span>
+                                            <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;local_service&#34;</span><span class=p>,</span>
+                                            <span class=nt>&#34;domains&#34;</span><span class=p>:</span> <span class=p>[</span>
+                                                <span class=s2>&#34;*&#34;</span>
+                                            <span class=p>],</span>
+                                            <span class=nt>&#34;routes&#34;</span><span class=p>:</span> <span class=p>[</span>
+                                                <span class=p>{</span>
+                                                    <span class=nt>&#34;match&#34;</span><span class=p>:</span> <span class=p>{</span>
+                                                        <span class=nt>&#34;prefix&#34;</span><span class=p>:</span> <span class=s2>&#34;/&#34;</span>
+                                                    <span class=p>},</span>
+                                                    <span class=nt>&#34;route&#34;</span><span class=p>:</span> <span class=p>{</span>
+                                                        <span class=nt>&#34;cluster&#34;</span><span class=p>:</span> <span class=s2>&#34;newTargetCluster&#34;</span>
+                                                    <span class=p>}</span>
+                                                <span class=p>}</span>
+                                            <span class=p>]</span>
+                                        <span class=p>}</span>
+                                    <span class=p>]</span>
+                                <span class=p>},</span>
+                                <span class=nt>&#34;http_filters&#34;</span><span class=p>:</span> <span class=p>[</span>
+                                    <span class=p>{</span>
+                                        <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;envoy.router&#34;</span>
+                                    <span class=p>}</span>
+                                <span class=p>]</span>
+                            <span class=p>}</span>
+                        <span class=p>}</span>
+                    <span class=p>]</span>
+                <span class=p>}</span>
+            <span class=p>]</span>
+    <span class=p>}]</span>
+<span class=p>}</span>
+</code></pre></td></tr></table></div></div><p>cds.conf</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-json data-lang=json><span class=p>{</span>
+  <span class=nt>&#34;version_info&#34;</span><span class=p>:</span> <span class=s2>&#34;0&#34;</span><span class=p>,</span>
+  <span class=nt>&#34;resources&#34;</span><span class=p>:</span> <span class=p>[{</span>
+      <span class=nt>&#34;@type&#34;</span><span class=p>:</span> <span class=s2>&#34;type.googleapis.com/envoy.api.v2.Cluster&#34;</span><span class=p>,</span>
+      <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;targetCluster&#34;</span><span class=p>,</span>
+            <span class=nt>&#34;connect_timeout&#34;</span><span class=p>:</span> <span class=s2>&#34;0.25s&#34;</span><span class=p>,</span>
+            <span class=nt>&#34;lb_policy&#34;</span><span class=p>:</span> <span class=s2>&#34;ROUND_ROBIN&#34;</span><span class=p>,</span>
+            <span class=nt>&#34;type&#34;</span><span class=p>:</span> <span class=s2>&#34;EDS&#34;</span><span class=p>,</span>
+            <span class=nt>&#34;eds_cluster_config&#34;</span><span class=p>:</span> <span class=p>{</span>
+                <span class=nt>&#34;service_name&#34;</span><span class=p>:</span> <span class=s2>&#34;localservices&#34;</span><span class=p>,</span>
+                <span class=nt>&#34;eds_config&#34;</span><span class=p>:</span> <span class=p>{</span>
+                    <span class=nt>&#34;path&#34;</span><span class=p>:</span> <span class=s2>&#34;/etc/envoy/eds.conf&#34;</span>
+                <span class=p>}</span>
+            <span class=p>}</span>
+  <span class=p>},</span>
+  <span class=p>{</span>
+      <span class=nt>&#34;@type&#34;</span><span class=p>:</span> <span class=s2>&#34;type.googleapis.com/envoy.api.v2.Cluster&#34;</span><span class=p>,</span>
+      <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;newTargetCluster&#34;</span><span class=p>,</span>
+            <span class=nt>&#34;connect_timeout&#34;</span><span class=p>:</span> <span class=s2>&#34;0.25s&#34;</span><span class=p>,</span>
+            <span class=nt>&#34;lb_policy&#34;</span><span class=p>:</span> <span class=s2>&#34;ROUND_ROBIN&#34;</span><span class=p>,</span>
+            <span class=nt>&#34;type&#34;</span><span class=p>:</span> <span class=s2>&#34;EDS&#34;</span><span class=p>,</span>
+            <span class=nt>&#34;eds_cluster_config&#34;</span><span class=p>:</span> <span class=p>{</span>
+                <span class=nt>&#34;service_name&#34;</span><span class=p>:</span> <span class=s2>&#34;localservices&#34;</span><span class=p>,</span>
+                <span class=nt>&#34;eds_config&#34;</span><span class=p>:</span> <span class=p>{</span>
+                    <span class=nt>&#34;path&#34;</span><span class=p>:</span> <span class=s2>&#34;/etc/envoy/eds1.conf&#34;</span>
+                <span class=p>}</span>
+            <span class=p>}</span>
+  <span class=p>}]</span>
+<span class=p>}</span>
+</code></pre></td></tr></table></div></div><p>eds.conf</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-json data-lang=json><span class=p>{</span>
+  <span class=nt>&#34;version_info&#34;</span><span class=p>:</span> <span class=s2>&#34;0&#34;</span><span class=p>,</span>
+  <span class=nt>&#34;resources&#34;</span><span class=p>:</span> <span class=p>[{</span>
+    <span class=nt>&#34;@type&#34;</span><span class=p>:</span> <span class=s2>&#34;type.googleapis.com/envoy.api.v2.ClusterLoadAssignment&#34;</span><span class=p>,</span>
+    <span class=nt>&#34;cluster_name&#34;</span><span class=p>:</span> <span class=s2>&#34;localservices&#34;</span><span class=p>,</span>
+    <span class=nt>&#34;endpoints&#34;</span><span class=p>:</span> <span class=p>[{</span>
+      <span class=nt>&#34;lb_endpoints&#34;</span><span class=p>:</span> <span class=p>[{</span>
+        <span class=nt>&#34;endpoint&#34;</span><span class=p>:</span> <span class=p>{</span>
+          <span class=nt>&#34;address&#34;</span><span class=p>:</span> <span class=p>{</span>
+            <span class=nt>&#34;socket_address&#34;</span><span class=p>:</span> <span class=p>{</span>
+              <span class=nt>&#34;address&#34;</span><span class=p>:</span> <span class=s2>&#34;172.17.0.3&#34;</span><span class=p>,</span>
+              <span class=nt>&#34;port_value&#34;</span><span class=p>:</span> <span class=mi>80</span>
+            <span class=p>}</span>
+          <span class=p>}</span>
+        <span class=p>}</span>
+      <span class=p>},{</span>
+        <span class=nt>&#34;endpoint&#34;</span><span class=p>:</span> <span class=p>{</span>
+          <span class=nt>&#34;address&#34;</span><span class=p>:</span> <span class=p>{</span>
+            <span class=nt>&#34;socket_address&#34;</span><span class=p>:</span> <span class=p>{</span>
+              <span class=nt>&#34;address&#34;</span><span class=p>:</span> <span class=s2>&#34;172.17.0.2&#34;</span><span class=p>,</span>
+              <span class=nt>&#34;port_value&#34;</span><span class=p>:</span> <span class=mi>80</span>
+            <span class=p>}</span>
+          <span class=p>}</span>
+        <span class=p>}</span>
+      <span class=p>}]</span>
+    <span class=p>}]</span>
+  <span class=p>}]</span>
+<span class=p>}</span>
+</code></pre></td></tr></table></div></div><p>eds1.conf</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-json data-lang=json><span class=p>{</span>
+  <span class=nt>&#34;version_info&#34;</span><span class=p>:</span> <span class=s2>&#34;0&#34;</span><span class=p>,</span>
+  <span class=nt>&#34;resources&#34;</span><span class=p>:</span> <span class=p>[{</span>
+    <span class=nt>&#34;@type&#34;</span><span class=p>:</span> <span class=s2>&#34;type.googleapis.com/envoy.api.v2.ClusterLoadAssignment&#34;</span><span class=p>,</span>
+    <span class=nt>&#34;cluster_name&#34;</span><span class=p>:</span> <span class=s2>&#34;localservices&#34;</span><span class=p>,</span>
+    <span class=nt>&#34;endpoints&#34;</span><span class=p>:</span> <span class=p>[{</span>
+      <span class=nt>&#34;lb_endpoints&#34;</span><span class=p>:</span> <span class=p>[{</span>
+        <span class=nt>&#34;endpoint&#34;</span><span class=p>:</span> <span class=p>{</span>
+          <span class=nt>&#34;address&#34;</span><span class=p>:</span> <span class=p>{</span>
+            <span class=nt>&#34;socket_address&#34;</span><span class=p>:</span> <span class=p>{</span>
+              <span class=nt>&#34;address&#34;</span><span class=p>:</span> <span class=s2>&#34;172.17.0.6&#34;</span><span class=p>,</span>
+              <span class=nt>&#34;port_value&#34;</span><span class=p>:</span> <span class=mi>80</span>
+            <span class=p>}</span>
+          <span class=p>}</span>
+        <span class=p>}</span>
+      <span class=p>},</span>
+        <span class=p>{</span>
+        <span class=nt>&#34;endpoint&#34;</span><span class=p>:</span> <span class=p>{</span>
+          <span class=nt>&#34;address&#34;</span><span class=p>:</span> <span class=p>{</span>
+            <span class=nt>&#34;socket_address&#34;</span><span class=p>:</span> <span class=p>{</span>
+              <span class=nt>&#34;address&#34;</span><span class=p>:</span> <span class=s2>&#34;172.17.0.5&#34;</span><span class=p>,</span>
+              <span class=nt>&#34;port_value&#34;</span><span class=p>:</span> <span class=mi>80</span>
+            <span class=p>}</span>
+          <span class=p>}</span>
+        <span class=p>}</span>
+      <span class=p>}]</span>
+    <span class=p>}]</span>
+  <span class=p>}]</span>
+<span class=p>}</span>
+</code></pre></td></tr></table></div></div><h1 id=操作>操作</h1><h3 id=启动-envoy>启动 Envoy</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>docker run -p 81:10000 -v /root/envoy-1.12.2/examples/file-based-dr/:/etc/envoy -v /root/envoy-1.12.2/examples/file-based-dr/envoy1.yaml:/ect/envoy/envoy.yaml envoyproxy/envoy
+</code></pre></td></tr></table></div></div><h3 id=启动上游服务>启动上游服务</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>docker run -d katacoda/docker-http-server
+
+docker run -d katacoda/docker-http-server
+
+docker run -d katacoda/docker-http-server
+
+docker run -d katacoda/docker-http-server
+</code></pre></td></tr></table></div></div><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image2019-12-30_18-26-47.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image2019-12-30_18-26-47.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image2019-12-30_18-26-47.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image2019-12-30_18-26-47.png 2x" data-sizes=auto alt=image2019-12-30_18-26-47 title=image2019-12-30_18-26-47></p><h1 id=测试>测试</h1><h3 id=访问-envoy>访问 Envoy</h3><p>结果：轮询访问上游服务</p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image2019-12-30_18-27-21.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image2019-12-30_18-27-21.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image2019-12-30_18-27-21.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image2019-12-30_18-27-21.png 2x" data-sizes=auto alt=image2019-12-30_18-27-21 title=image2019-12-30_18-27-21></p><h3 id=更改-lds-路由配置>更改 lds 路由配置</h3><p>&ldquo;route&rdquo;: {
+&ldquo;cluster&rdquo;: &ldquo;targetCluster&rdquo;
+}</p><p>=></p><p>&ldquo;route&rdquo;: {
+&ldquo;cluster&rdquo;: &ldquo;newTargetCluster&rdquo;
+}</p><p>结果：更新配置后，无需重启 Envoy，访问新的上游服务，达到动态更新</p><p>注：Based on how Docker handles file inode tracking, sometimes the filesystem change isn&rsquo;t triggered and detected. Force the change with the command <code>mv lds.conf tmp; mv tmp lds.conf</code></p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image2019-12-30_18-29-8.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image2019-12-30_18-29-8.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image2019-12-30_18-29-8.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image2019-12-30_18-29-8.png 2x" data-sizes=auto alt=image2019-12-30_18-29-8 title=image2019-12-30_18-29-8></p></div><div class=post-footer id=post-footer><div class=post-info><div class=post-info-line><div class=post-info-mod><span>更新于 2020-05-06</span></div><div class=post-info-license></div></div><div class=post-info-line><div class=post-info-md></div><div class=post-info-share><span></span></div></div></div><div class=post-info-more><section class=post-tags><i class="fas fa-tags fa-fw"></i>&nbsp;<a href=/tags/envoy/>Envoy</a>,&nbsp;<a href=/tags/%E5%AE%9E%E9%AA%8C/>实验</a></section><section><span><a href=javascript:void(0); onclick=window.history.back();>返回</a></span>&nbsp;|&nbsp;<span><a href=/>主页</a></span></section></div><div class=post-nav><a href=/envoy-%E5%89%8D%E7%AB%AF%E4%BB%A3%E7%90%86/ class=prev rel=prev title="Envoy 前端代理"><i class="fas fa-angle-left fa-fw"></i>Envoy 前端代理</a>
+<a href=/%E5%9F%BA%E4%BA%8Eapi%E7%9A%84%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1/ class=next rel=next title=基于API的动态路由>基于API的动态路由<i class="fas fa-angle-right fa-fw"></i></a></div></div><div id=comments><div id=gitalk class=comment></div><noscript>Please enable JavaScript to view the comments powered by <a href=https://github.com/gitalk/gitalk></a>Gitalk</a>.</noscript></div></article></div></main><footer class=footer><div class=footer-container><div class=footer-line>由 <a href=https://gohugo.io/ target=_blank rel="noopener noreffer" title="Hugo 0.71.1">Hugo</a> 强力驱动 | 主题 - <a href=https://github.com/dillonzq/LoveIt target=_blank rel="noopener noreffer" title="LoveIt 0.2.9"><i class="far fa-kiss-wink-heart fa-fw"></i>LoveIt</a></div><div class=footer-line><i class="far fa-copyright fa-fw"></i><span itemprop=copyrightYear>2019 - 2020</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=garroshh.me target=_blank>garroshh</a></span>&nbsp;|&nbsp;<span class=license><a rel="license external nofollow noopener noreffer" href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank>CC BY-NC 4.0</a></span></div></div></footer></div><div id=fixed-buttons><a href=# id=back-to-top class=fixed-button title=回到顶部><i class="fas fa-arrow-up fa-fw"></i></a><a href=# id=view-comments class=fixed-button title=查看评论><i class="fas fa-comment fa-fw"></i></a></div><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/gitalk@1.6.2/dist/gitalk.min.css><script type=text/javascript src=https://cdn.jsdelivr.net/npm/gitalk@1.6.2/dist/gitalk.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/smooth-scroll@16.1.3/dist/smooth-scroll.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/autocomplete.js@0.37.1/dist/autocomplete.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/algoliasearch@4.2.0/dist/algoliasearch-lite.umd.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/lazysizes@5.2.0/lazysizes.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/typeit@7.0.4/dist/typeit.min.js></script><script type=text/javascript>window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":10},"comment":{"gitalk":{"admin":["garroshh"],"clientID":"765aeb40ecd9058c4ab8","clientSecret":"824af1ecb35c665e4d7fb379211bb748841e96a1","id":"2020-05-06T11:25:32+08:00","owner":"garroshh","repo":"garroshh.github.io","title":"基于文件的动态路由"}},"data":{"id-1":"Garroshh's Blog","id-2":"Garroshh's Blog"},"search":{"algoliaAppID":"PASDMWALPK","algoliaIndex":"index.zh-cn","algoliaSearchKey":"b42948e51daaa93df92381c8e2ac0f93","highlightTag":"em","maxResultLength":10,"noResultsFound":"没有找到结果","snippetLength":50,"type":"algolia"},"typeit":{"cursorChar":"|","cursorSpeed":1000,"data":{"id-1":["id-1"],"id-2":["id-2"]},"duration":-1,"speed":100}};</script><script type=text/javascript src=/js/theme.min.js></script></body></html>

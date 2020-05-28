@@ -1,0 +1,710 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noodp"><meta http-equiv=x-ua-compatible content="IE=edge, chrome=1"><title>流量监控 - LoveIt</title><meta name=Description content="关于 LoveIt 主题"><meta property="og:title" content="流量监控"><meta property="og:description" content="Istio 的 Proxy 通过拦截系统中所有网络的通信，来提供可用于获得整个应用的可观察性的指标和数据。比如：若一个服务响应过慢是由 CPU 占用率过高导致的，则可以采"><meta property="og:type" content="article"><meta property="og:url" content="https://garroshh.me/%E6%B5%81%E9%87%8F%E7%9B%91%E6%8E%A7/"><meta property="og:image" content="https://garroshh.me/logo.png"><meta property="article:published_time" content="2020-05-11T19:01:49+08:00"><meta property="article:modified_time" content="2020-05-11T19:01:49+08:00"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://garroshh.me/logo.png"><meta name=twitter:title content="流量监控"><meta name=twitter:description content="Istio 的 Proxy 通过拦截系统中所有网络的通信，来提供可用于获得整个应用的可观察性的指标和数据。比如：若一个服务响应过慢是由 CPU 占用率过高导致的，则可以采"><meta name=application-name content="LoveIt"><meta name=apple-mobile-web-app-title content="LoveIt"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://garroshh.me/%E6%B5%81%E9%87%8F%E7%9B%91%E6%8E%A7/><link rel=prev href=https://garroshh.me/helm3%E9%83%A8%E7%BD%B2istio-1.4/><link rel=next href=https://garroshh.me/%E7%81%B0%E5%BA%A6%E5%8F%91%E5%B8%83/><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css><link rel=stylesheet href=/css/style.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/animate.css@3.7.2/animate.min.css><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"流量监控","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/garroshh.me\/%E6%B5%81%E9%87%8F%E7%9B%91%E6%8E%A7\/"},"image":{"@type":"ImageObject","url":"https:\/\/garroshh.me\/cover.png","width":800,"height":600},"genre":"posts","keywords":"Istio, 实验","wordcount":3679,"url":"https:\/\/garroshh.me\/%E6%B5%81%E9%87%8F%E7%9B%91%E6%8E%A7\/","datePublished":"2020-05-11T19:01:49+08:00","dateModified":"2020-05-11T19:01:49+08:00","license":"This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher":{"@type":"Organization","name":"xxxx","logo":{"@type":"ImageObject","url":"https:\/\/garroshh.me\/logo.png","width":127,"height":40}},"author":{"@type":"Person","name":"garroshh"},"description":""}</script></head><body header-desktop=fixed header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem('theme')?localStorage.getItem('theme')==='dark':('auto'==='auto'?window.matchMedia('(prefers-color-scheme: dark)').matches:'auto'==='dark'))&&document.body.setAttribute('theme','dark');</script><div id=mask></div><div class=wrapper><header class=desktop id=header-desktop><div class=header-wrapper><div class=header-title><a href=/ title=LoveIt><span class=header-title-pre><i class="far fa-kiss-wink-heart fa-fw"></i></span><span id=id-1 class=typeit></span></a></div><div class=menu><div class=menu-inner><a class=menu-item href=/posts/>所有文章 </a><a class=menu-item href=/tags/>标签 </a><a class=menu-item href=/categories/>分类 </a><a class=menu-item href=/categories/documentation/>文档 </a><a class=menu-item href=/about/>关于 </a><a class=menu-item href=https://github.com/dillonzq/LoveIt title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i></a><span class="menu-item delimiter"></span><a href=javascript:void(0); class="menu-item language" title=选择语言>简体中文<i class="fas fa-chevron-right fa-fw"></i>
+<select class=language-select id=language-select-desktop onchange="location=this.value;"><option value=/%E6%B5%81%E9%87%8F%E7%9B%91%E6%8E%A7/ selected>简体中文</option></select>
+</a><span class="menu-item search" id=search-desktop><input type=text placeholder=搜索文章标题或内容... id=search-input-desktop>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-desktop title=搜索><i class="fas fa-search fa-fw"></i></a><a href=javascript:void(0); class="search-button search-clear" id=search-clear-desktop title=清空><i class="fas fa-times-circle fa-fw"></i></a><span class="search-button search-loading" id=search-loading-desktop><i class="fas fa-spinner fa-fw fa-spin"></i></span></span><a href=javascript:void(0); class="menu-item theme-switch" title=切换主题><i class="fas fa-adjust fa-fw"></i></a></div></div></div></header><header class=mobile id=header-mobile><div class=header-container><div class=header-wrapper><div class=header-title><a href=/ title=LoveIt><span class=header-title-pre><i class="far fa-kiss-wink-heart fa-fw"></i></span><span id=id-2 class=typeit></span></a></div><div class=menu-toggle id=menu-toggle-mobile><span></span><span></span><span></span></div></div><div class=menu id=menu-mobile><div class=search-wrapper><div class="search mobile" id=search-mobile><input type=text placeholder=搜索文章标题或内容... id=search-input-mobile>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-mobile title=搜索><i class="fas fa-search fa-fw"></i></a><a href=javascript:void(0); class="search-button search-clear" id=search-clear-mobile title=清空><i class="fas fa-times-circle fa-fw"></i></a><span class="search-button search-loading" id=search-loading-mobile><i class="fas fa-spinner fa-fw fa-spin"></i></span></div><a href=javascript:void(0); class=search-cancel id=search-cancel-mobile>取消</a></div><a class=menu-item href=/posts/>所有文章</a><a class=menu-item href=/tags/>标签</a><a class=menu-item href=/categories/>分类</a><a class=menu-item href=/categories/documentation/>文档</a><a class=menu-item href=/about/>关于</a><a class=menu-item href=https://github.com/dillonzq/LoveIt title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i></a><a href=javascript:void(0); class="menu-item theme-switch" title=切换主题>
+<i class="fas fa-adjust fa-fw"></i></a><a href=javascript:void(0); class=menu-item title=选择语言>简体中文<i class="fas fa-chevron-right fa-fw"></i>
+<select class=language-select onchange="location=this.value;"><option value=/%E6%B5%81%E9%87%8F%E7%9B%91%E6%8E%A7/ selected>简体中文</option></select></a></div></div></header><div class="search-dropdown desktop"><div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile"><div id=search-dropdown-mobile></div></div><main class=main><div class=container><div class=toc id=toc-auto><h2 class=toc-title>目录</h2><div class=toc-content id=toc-content-auto></div></div><article class="page single"><h1 class="single-title animated flipInX">流量监控</h1><div class=post-meta><div class=post-meta-line><span class=post-author><a href=garroshh.me title=Author rel=author class=author><i class="fas fa-user-circle fa-fw"></i>garroshh</a></span>&nbsp;<span class=post-category>收录于 <a href=/categories/istio/><i class="far fa-folder fa-fw"></i>Istio</a></span></div><div class=post-meta-line><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime=2020-05-11>2020-05-11</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 3679 字&nbsp;
+<i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 8 分钟&nbsp;</div></div><div class="details toc" id=toc-static kept><div class="details-summary toc-title"><span>目录</span>
+<span><i class="details-icon fas fa-angle-right"></i></span></div><div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents><ul><li><ul><li><a href=#prometheus>Prometheus</a></li></ul></li></ul><ul><li><ul><li><a href=#istio-mesh-dashboard>Istio Mesh Dashboard</a></li><li><a href=#istio-service-dashboard>Istio Service Dashboard</a></li><li><a href=#istio-workload-dashboard>Istio Workload Dashboard</a></li><li><a href=#istio-performance-dashboard>Istio Performance Dashboard</a></li><li><a href=#自定义-dashboard>自定义 Dashboard</a></li></ul></li></ul></nav></div></div><div class=content id=content><p>Istio 的 Proxy 通过拦截系统中所有网络的通信，来提供可用于获得整个应用的可观察性的指标和数据。比如：若一个服务响应过慢是由</p><p>CPU 占用率过高导致的，则可以采用弹性伸缩来解决问题；若一个服务响应过慢是由于访问量突然增大引起的，则可以采取熔断限流等措施。</p><h1 id=1-预先准备安装插件>1. 预先准备：安装插件</h1><p>在使用 Istio 的流量功能前，需要在集群中安装 Jaeger、Prometheus、Grafana 和 Kiali 等插件。如果这些插件在部署时未启用，则可以使用</p><p>helm upgrade 命令进行启用。</p><ul><li>Grafana：–set grafana.enabled=true</li><li>Kiali：–set kiali.enabled=true</li><li>Prometheus：–set prometheus.enabled=true</li><li>Tracing：–set tracing.enabled=true</li></ul><p>在登录 Kiali 时需要输入用户名和密码，执行以下命令创建 Kiali 的 Secret：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>kubectl apply -f chapter-files/telemetry/kiali-secret.yaml
+</code></pre></td></tr></table></div></div><p>kiali-secret.yaml 保存了经过 Base64 编码的用户和密码信息，初始的用户名是 admin，密码也是 admin。可以在 Secret 中按需修改这部分信息，</p><p>在创建 Secret 后有些 Kiali 版本需要重启才能生效。</p><p>所有插件都安装成功后，为了在集群外的浏览器中打开界面，需配置每个插件的对外访问方式，如下命令使用 Gateway 设置 HTTP 访问各插件：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>kubectl apply -f chapter-files/telemetry/access-addons.yaml
+</code></pre></td></tr></table></div></div><p>Gateway 资源创建完成后，在浏览器输入对应插件的地址进行访问：</p><ul><li>Kiali：http://<ip>:15029/kiali</li><li>Prometheus：http://<ip>:15030/</li><li>Grafana：http://<ip>:15031/</li><li>Tracing：http://<ip>:15032/</li></ul><h1 id=2-调用链跟踪>2. 调用链跟踪</h1><p>调用链跟踪是一种用于分析和监控微服务应用的方法，OpenTracing 是分布式跟踪的 API 规范，提供了统一的接口，方便开发者在自己的服务中集成</p><p>一种或多种分布式追踪的实现。Istio 使用 Jaeger 作为调用链的引擎。</p><p>一次调用链跟踪（Trace）由若干个 Span 组成，Span 是请求数据的最小单位，包括这次跟踪的开始时间、结束时间、操作名称及一组标签和日志。尽管</p><p>Proxy 可以自动生成 Span，但是应用程序需要传播响应的 HTTP Header，这样这些 Span 才能被正确关联到一个跟踪。因此，需要应用程序手机传入请求</p><p>中的以下 HTTP Header 并将其传播出去。</p><ul><li>x-request-id</li><li>x-b3-traceid</li><li>x-b3-spanid</li><li>x-b3-parentspanid</li><li>x-b3-sampled</li><li>x-b3-flags</li><li>x-ot-span-context</li></ul><p>访问 Jaeger 页面：<a href=http://10.12.1.100:30655/jaeger/search target=_blank rel="noopener noreffer">http://10.12.1.100:30655/</a></p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190507400.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190507400.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190507400.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190507400.png 2x" data-sizes=auto alt=image-20200511190507400 title=image-20200511190507400></p><p>在浏览器中访问前台页面查询天气，在这个过程中会产生调用链信息。从界面左边面板的 Service 下拉列表中选择 frontend.weather，并单击左下角</p><p>&ldquo;Find Traces&rdquo; 按钮检索调用链，右侧会显示调用链记录的列表：</p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190534409.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190534409.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190534409.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190534409.png 2x" data-sizes=auto alt=image-20200511190534409 title=image-20200511190534409></p><p>调用链数据的频繁采集会对系统造成严重的性能损失，Istio 为了提高系统性能，设置默认采样率为 1%。如果遇到调用链不能正常获取的情况，则需要调整</p><p>跟踪取样率。Istio 的跟踪取样率被设置为 istio-pilot 的环境变量 PILOT_TRACE_SAMPLING，取值范围为 1.0 ~ 100.0：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>kubectl -n istio-system edit deploy istio-pilot
+</code></pre></td></tr></table></div></div><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190556547.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190556547.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190556547.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190556547.png 2x" data-sizes=auto alt=image-20200511190556547 title=image-20200511190556547></p><p>单击某一个跟踪记录，可以查看其包含的所有 Span 和每个 Span 的消耗时间。如下的跟踪信息有 4 个 Span，涉及 3 个服务，一共耗时 7.21 毫秒。</p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190623214.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190623214.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190623214.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190623214.png 2x" data-sizes=auto alt=image-20200511190623214 title=image-20200511190623214></p><p>在跟踪（Trace）的详情页可以单击某个 Span 来查看其详细信息，包括被调用的 URL、HTTP 方法、响应状态和其他 Header 信息</p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190650337.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190650337.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190650337.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190650337.png 2x" data-sizes=auto alt=image-20200511190650337 title=image-20200511190650337></p><p>此外，Jaeger 还提供了 Compare 功能（用来对比不同 Trace 信息）和 Dependencies 视图（展现各个服务如何相互调用）。</p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190711960.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190711960.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190711960.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190711960.png 2x" data-sizes=auto alt=image-20200511190711960 title=image-20200511190711960></p><h1 id=3-指标监控>3. 指标监控</h1><p>Metrics 是服务的监控指标数据，指标数据通常分为 4 类：Counter、Gauge、Histogram 和 Summary。Istio 内置了几种常见的度量标准类型，</p><p>也可以创建自定义指标。</p><h3 id=prometheus>Prometheus</h3><p>Istio 默认启用了预置的 Prometheus 组件，配置文件被定义在 istio-system 命名空间下的名称为 Prometheus 的 ConfigMap 中，并被挂载到</p><p>Prometheus 的 Pod 内。Prometheus 容器内的配置文件 &ldquo;/etc/prometheus/prometheus.yaml&rdquo; 如下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>  1
+</span><span class=lnt>  2
+</span><span class=lnt>  3
+</span><span class=lnt>  4
+</span><span class=lnt>  5
+</span><span class=lnt>  6
+</span><span class=lnt>  7
+</span><span class=lnt>  8
+</span><span class=lnt>  9
+</span><span class=lnt> 10
+</span><span class=lnt> 11
+</span><span class=lnt> 12
+</span><span class=lnt> 13
+</span><span class=lnt> 14
+</span><span class=lnt> 15
+</span><span class=lnt> 16
+</span><span class=lnt> 17
+</span><span class=lnt> 18
+</span><span class=lnt> 19
+</span><span class=lnt> 20
+</span><span class=lnt> 21
+</span><span class=lnt> 22
+</span><span class=lnt> 23
+</span><span class=lnt> 24
+</span><span class=lnt> 25
+</span><span class=lnt> 26
+</span><span class=lnt> 27
+</span><span class=lnt> 28
+</span><span class=lnt> 29
+</span><span class=lnt> 30
+</span><span class=lnt> 31
+</span><span class=lnt> 32
+</span><span class=lnt> 33
+</span><span class=lnt> 34
+</span><span class=lnt> 35
+</span><span class=lnt> 36
+</span><span class=lnt> 37
+</span><span class=lnt> 38
+</span><span class=lnt> 39
+</span><span class=lnt> 40
+</span><span class=lnt> 41
+</span><span class=lnt> 42
+</span><span class=lnt> 43
+</span><span class=lnt> 44
+</span><span class=lnt> 45
+</span><span class=lnt> 46
+</span><span class=lnt> 47
+</span><span class=lnt> 48
+</span><span class=lnt> 49
+</span><span class=lnt> 50
+</span><span class=lnt> 51
+</span><span class=lnt> 52
+</span><span class=lnt> 53
+</span><span class=lnt> 54
+</span><span class=lnt> 55
+</span><span class=lnt> 56
+</span><span class=lnt> 57
+</span><span class=lnt> 58
+</span><span class=lnt> 59
+</span><span class=lnt> 60
+</span><span class=lnt> 61
+</span><span class=lnt> 62
+</span><span class=lnt> 63
+</span><span class=lnt> 64
+</span><span class=lnt> 65
+</span><span class=lnt> 66
+</span><span class=lnt> 67
+</span><span class=lnt> 68
+</span><span class=lnt> 69
+</span><span class=lnt> 70
+</span><span class=lnt> 71
+</span><span class=lnt> 72
+</span><span class=lnt> 73
+</span><span class=lnt> 74
+</span><span class=lnt> 75
+</span><span class=lnt> 76
+</span><span class=lnt> 77
+</span><span class=lnt> 78
+</span><span class=lnt> 79
+</span><span class=lnt> 80
+</span><span class=lnt> 81
+</span><span class=lnt> 82
+</span><span class=lnt> 83
+</span><span class=lnt> 84
+</span><span class=lnt> 85
+</span><span class=lnt> 86
+</span><span class=lnt> 87
+</span><span class=lnt> 88
+</span><span class=lnt> 89
+</span><span class=lnt> 90
+</span><span class=lnt> 91
+</span><span class=lnt> 92
+</span><span class=lnt> 93
+</span><span class=lnt> 94
+</span><span class=lnt> 95
+</span><span class=lnt> 96
+</span><span class=lnt> 97
+</span><span class=lnt> 98
+</span><span class=lnt> 99
+</span><span class=lnt>100
+</span><span class=lnt>101
+</span><span class=lnt>102
+</span><span class=lnt>103
+</span><span class=lnt>104
+</span><span class=lnt>105
+</span><span class=lnt>106
+</span><span class=lnt>107
+</span><span class=lnt>108
+</span><span class=lnt>109
+</span><span class=lnt>110
+</span><span class=lnt>111
+</span><span class=lnt>112
+</span><span class=lnt>113
+</span><span class=lnt>114
+</span><span class=lnt>115
+</span><span class=lnt>116
+</span><span class=lnt>117
+</span><span class=lnt>118
+</span><span class=lnt>119
+</span><span class=lnt>120
+</span><span class=lnt>121
+</span><span class=lnt>122
+</span><span class=lnt>123
+</span><span class=lnt>124
+</span><span class=lnt>125
+</span><span class=lnt>126
+</span><span class=lnt>127
+</span><span class=lnt>128
+</span><span class=lnt>129
+</span><span class=lnt>130
+</span><span class=lnt>131
+</span><span class=lnt>132
+</span><span class=lnt>133
+</span><span class=lnt>134
+</span><span class=lnt>135
+</span><span class=lnt>136
+</span><span class=lnt>137
+</span><span class=lnt>138
+</span><span class=lnt>139
+</span><span class=lnt>140
+</span><span class=lnt>141
+</span><span class=lnt>142
+</span><span class=lnt>143
+</span><span class=lnt>144
+</span><span class=lnt>145
+</span><span class=lnt>146
+</span><span class=lnt>147
+</span><span class=lnt>148
+</span><span class=lnt>149
+</span><span class=lnt>150
+</span><span class=lnt>151
+</span><span class=lnt>152
+</span><span class=lnt>153
+</span><span class=lnt>154
+</span><span class=lnt>155
+</span><span class=lnt>156
+</span><span class=lnt>157
+</span><span class=lnt>158
+</span><span class=lnt>159
+</span><span class=lnt>160
+</span><span class=lnt>161
+</span><span class=lnt>162
+</span><span class=lnt>163
+</span><span class=lnt>164
+</span><span class=lnt>165
+</span><span class=lnt>166
+</span><span class=lnt>167
+</span><span class=lnt>168
+</span><span class=lnt>169
+</span><span class=lnt>170
+</span><span class=lnt>171
+</span><span class=lnt>172
+</span><span class=lnt>173
+</span><span class=lnt>174
+</span><span class=lnt>175
+</span><span class=lnt>176
+</span><span class=lnt>177
+</span><span class=lnt>178
+</span><span class=lnt>179
+</span><span class=lnt>180
+</span><span class=lnt>181
+</span><span class=lnt>182
+</span><span class=lnt>183
+</span><span class=lnt>184
+</span><span class=lnt>185
+</span><span class=lnt>186
+</span><span class=lnt>187
+</span><span class=lnt>188
+</span><span class=lnt>189
+</span><span class=lnt>190
+</span><span class=lnt>191
+</span><span class=lnt>192
+</span><span class=lnt>193
+</span><span class=lnt>194
+</span><span class=lnt>195
+</span><span class=lnt>196
+</span><span class=lnt>197
+</span><span class=lnt>198
+</span><span class=lnt>199
+</span><span class=lnt>200
+</span><span class=lnt>201
+</span><span class=lnt>202
+</span><span class=lnt>203
+</span><span class=lnt>204
+</span><span class=lnt>205
+</span><span class=lnt>206
+</span><span class=lnt>207
+</span><span class=lnt>208
+</span><span class=lnt>209
+</span><span class=lnt>210
+</span><span class=lnt>211
+</span><span class=lnt>212
+</span><span class=lnt>213
+</span><span class=lnt>214
+</span><span class=lnt>215
+</span><span class=lnt>216
+</span><span class=lnt>217
+</span><span class=lnt>218
+</span><span class=lnt>219
+</span><span class=lnt>220
+</span><span class=lnt>221
+</span><span class=lnt>222
+</span><span class=lnt>223
+</span><span class=lnt>224
+</span><span class=lnt>225
+</span><span class=lnt>226
+</span><span class=lnt>227
+</span><span class=lnt>228
+</span><span class=lnt>229
+</span><span class=lnt>230
+</span><span class=lnt>231
+</span><span class=lnt>232
+</span><span class=lnt>233
+</span><span class=lnt>234
+</span><span class=lnt>235
+</span><span class=lnt>236
+</span><span class=lnt>237
+</span><span class=lnt>238
+</span><span class=lnt>239
+</span><span class=lnt>240
+</span><span class=lnt>241
+</span><span class=lnt>242
+</span><span class=lnt>243
+</span><span class=lnt>244
+</span><span class=lnt>245
+</span><span class=lnt>246
+</span><span class=lnt>247
+</span><span class=lnt>248
+</span><span class=lnt>249
+</span><span class=lnt>250
+</span><span class=lnt>251
+</span><span class=lnt>252
+</span><span class=lnt>253
+</span><span class=lnt>254
+</span><span class=lnt>255
+</span><span class=lnt>256
+</span><span class=lnt>257
+</span><span class=lnt>258
+</span><span class=lnt>259
+</span><span class=lnt>260
+</span><span class=lnt>261
+</span><span class=lnt>262
+</span><span class=lnt>263
+</span><span class=lnt>264
+</span><span class=lnt>265
+</span><span class=lnt>266
+</span><span class=lnt>267
+</span><span class=lnt>268
+</span><span class=lnt>269
+</span><span class=lnt>270
+</span><span class=lnt>271
+</span><span class=lnt>272
+</span><span class=lnt>273
+</span><span class=lnt>274
+</span><span class=lnt>275
+</span><span class=lnt>276
+</span><span class=lnt>277
+</span><span class=lnt>278
+</span><span class=lnt>279
+</span><span class=lnt>280
+</span><span class=lnt>281
+</span><span class=lnt>282
+</span><span class=lnt>283
+</span><span class=lnt>284
+</span><span class=lnt>285
+</span><span class=lnt>286
+</span><span class=lnt>287
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-yaml data-lang=yaml>kubectl<span class=w> </span>get<span class=w> </span>cm<span class=w> </span>prometheus<span class=w> </span>-n<span class=w> </span>istio-system<span class=w> </span>-oyaml<span class=w>
+</span><span class=w> 
+</span><span class=w></span><span class=k>apiVersion</span><span class=p>:</span><span class=w> </span>v1<span class=w>
+</span><span class=w></span><span class=k>data</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span><span class=k>prometheus.yml</span><span class=p>:</span><span class=w> </span>|<span class=sd>-
+</span><span class=sd>    global:</span><span class=w>
+</span><span class=w>      </span><span class=k>scrape_interval</span><span class=p>:</span><span class=w> </span>15s<span class=w>
+</span><span class=w>    </span><span class=k>scrape_configs</span><span class=p>:</span><span class=w>
+</span><span class=w> 
+</span><span class=w>    </span>- <span class=k>job_name</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;istio-mesh&#39;</span><span class=w>
+</span><span class=w>      </span><span class=k>kubernetes_sd_configs</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span>- <span class=k>role</span><span class=p>:</span><span class=w> </span>endpoints<span class=w>
+</span><span class=w>        </span><span class=k>namespaces</span><span class=p>:</span><span class=w>
+</span><span class=w>          </span><span class=k>names</span><span class=p>:</span><span class=w>
+</span><span class=w>          </span>- istio-system<span class=w>
+</span><span class=w> 
+</span><span class=w>      </span><span class=k>relabel_configs</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__meta_kubernetes_service_name<span class=p>,</span><span class=w> </span>__meta_kubernetes_endpoint_port_name<span class=p>]</span><span class=w>
+</span><span class=w>        </span><span class=k>action</span><span class=p>:</span><span class=w> </span>keep<span class=w>
+</span><span class=w>        </span><span class=k>regex</span><span class=p>:</span><span class=w> </span>istio-telemetry;prometheus<span class=w>
+</span><span class=w> 
+</span><span class=w>    </span><span class=c># Scrape config for envoy stats</span><span class=w>
+</span><span class=w>    </span>- <span class=k>job_name</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;envoy-stats&#39;</span><span class=w>
+</span><span class=w>      </span><span class=k>metrics_path</span><span class=p>:</span><span class=w> </span>/stats/prometheus<span class=w>
+</span><span class=w>      </span><span class=k>kubernetes_sd_configs</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span>- <span class=k>role</span><span class=p>:</span><span class=w> </span>pod<span class=w>
+</span><span class=w> 
+</span><span class=w>      </span><span class=k>relabel_configs</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__meta_kubernetes_pod_container_port_name<span class=p>]</span><span class=w>
+</span><span class=w>        </span><span class=k>action</span><span class=p>:</span><span class=w> </span>keep<span class=w>
+</span><span class=w>        </span><span class=k>regex</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;.*-envoy-prom&#39;</span><span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__address__<span class=p>,</span><span class=w> </span>__meta_kubernetes_pod_annotation_prometheus_io_port<span class=p>]</span><span class=w>
+</span><span class=w>        </span><span class=k>action</span><span class=p>:</span><span class=w> </span>replace<span class=w>
+</span><span class=w>        </span><span class=k>regex</span><span class=p>:</span><span class=w> </span>(<span class=p>[</span>^<span class=p>:]</span>+)(<span class=p>?::</span>\d+)<span class=p>?</span>;(\d+)<span class=w>
+</span><span class=w>        </span><span class=k>replacement</span><span class=p>:</span><span class=w> </span>$<span class=m>1</span><span class=p>:</span><span class=m>15090</span><span class=w>
+</span><span class=w>        </span><span class=k>target_label</span><span class=p>:</span><span class=w> </span>__address__<span class=w>
+</span><span class=w>      </span>- <span class=k>action</span><span class=p>:</span><span class=w> </span>labelmap<span class=w>
+</span><span class=w>        </span><span class=k>regex</span><span class=p>:</span><span class=w> </span>__meta_kubernetes_pod_label_(.+)<span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__meta_kubernetes_namespace<span class=p>]</span><span class=w>
+</span><span class=w>        </span><span class=k>action</span><span class=p>:</span><span class=w> </span>replace<span class=w>
+</span><span class=w>        </span><span class=k>target_label</span><span class=p>:</span><span class=w> </span>namespace<span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__meta_kubernetes_pod_name<span class=p>]</span><span class=w>
+</span><span class=w>        </span><span class=k>action</span><span class=p>:</span><span class=w> </span>replace<span class=w>
+</span><span class=w>        </span><span class=k>target_label</span><span class=p>:</span><span class=w> </span>pod_name<span class=w>
+</span><span class=w> 
+</span><span class=w>    </span>- <span class=k>job_name</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;istio-policy&#39;</span><span class=w>
+</span><span class=w>      </span><span class=k>kubernetes_sd_configs</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span>- <span class=k>role</span><span class=p>:</span><span class=w> </span>endpoints<span class=w>
+</span><span class=w>        </span><span class=k>namespaces</span><span class=p>:</span><span class=w>
+</span><span class=w>          </span><span class=k>names</span><span class=p>:</span><span class=w>
+</span><span class=w>          </span>- istio-system<span class=w>
+</span><span class=w> 
+</span><span class=w> 
+</span><span class=w>      </span><span class=k>relabel_configs</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__meta_kubernetes_service_name<span class=p>,</span><span class=w> </span>__meta_kubernetes_endpoint_port_name<span class=p>]</span><span class=w>
+</span><span class=w>        </span><span class=k>action</span><span class=p>:</span><span class=w> </span>keep<span class=w>
+</span><span class=w>        </span><span class=k>regex</span><span class=p>:</span><span class=w> </span>istio-policy;http-monitoring<span class=w>
+</span><span class=w> 
+</span><span class=w>    </span>- <span class=k>job_name</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;istio-telemetry&#39;</span><span class=w>
+</span><span class=w>      </span><span class=k>kubernetes_sd_configs</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span>- <span class=k>role</span><span class=p>:</span><span class=w> </span>endpoints<span class=w>
+</span><span class=w>        </span><span class=k>namespaces</span><span class=p>:</span><span class=w>
+</span><span class=w>          </span><span class=k>names</span><span class=p>:</span><span class=w>
+</span><span class=w>          </span>- istio-system<span class=w>
+</span><span class=w> 
+</span><span class=w>      </span><span class=k>relabel_configs</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__meta_kubernetes_service_name<span class=p>,</span><span class=w> </span>__meta_kubernetes_endpoint_port_name<span class=p>]</span><span class=w>
+</span><span class=w>        </span><span class=k>action</span><span class=p>:</span><span class=w> </span>keep<span class=w>
+</span><span class=w>        </span><span class=k>regex</span><span class=p>:</span><span class=w> </span>istio-telemetry;http-monitoring<span class=w>
+</span><span class=w> 
+</span><span class=w>    </span>- <span class=k>job_name</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;pilot&#39;</span><span class=w>
+</span><span class=w>      </span><span class=k>kubernetes_sd_configs</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span>- <span class=k>role</span><span class=p>:</span><span class=w> </span>endpoints<span class=w>
+</span><span class=w>        </span><span class=k>namespaces</span><span class=p>:</span><span class=w>
+</span><span class=w>          </span><span class=k>names</span><span class=p>:</span><span class=w>
+</span><span class=w>          </span>- istio-system<span class=w>
+</span><span class=w> 
+</span><span class=w>      </span><span class=k>relabel_configs</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__meta_kubernetes_service_name<span class=p>,</span><span class=w> </span>__meta_kubernetes_endpoint_port_name<span class=p>]</span><span class=w>
+</span><span class=w>        </span><span class=k>action</span><span class=p>:</span><span class=w> </span>keep<span class=w>
+</span><span class=w>        </span><span class=k>regex</span><span class=p>:</span><span class=w> </span>istio-pilot;http-monitoring<span class=w>
+</span><span class=w> 
+</span><span class=w>    </span>- <span class=k>job_name</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;galley&#39;</span><span class=w>
+</span><span class=w>      </span><span class=k>kubernetes_sd_configs</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span>- <span class=k>role</span><span class=p>:</span><span class=w> </span>endpoints<span class=w>
+</span><span class=w>        </span><span class=k>namespaces</span><span class=p>:</span><span class=w>
+</span><span class=w>          </span><span class=k>names</span><span class=p>:</span><span class=w>
+</span><span class=w>          </span>- istio-system<span class=w>
+</span><span class=w> 
+</span><span class=w>      </span><span class=k>relabel_configs</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__meta_kubernetes_service_name<span class=p>,</span><span class=w> </span>__meta_kubernetes_endpoint_port_name<span class=p>]</span><span class=w>
+</span><span class=w>        </span><span class=k>action</span><span class=p>:</span><span class=w> </span>keep<span class=w>
+</span><span class=w>        </span><span class=k>regex</span><span class=p>:</span><span class=w> </span>istio-galley;http-monitoring<span class=w>
+</span><span class=w> 
+</span><span class=w>    </span>- <span class=k>job_name</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;citadel&#39;</span><span class=w>
+</span><span class=w>      </span><span class=k>kubernetes_sd_configs</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span>- <span class=k>role</span><span class=p>:</span><span class=w> </span>endpoints<span class=w>
+</span><span class=w>        </span><span class=k>namespaces</span><span class=p>:</span><span class=w>
+</span><span class=w>          </span><span class=k>names</span><span class=p>:</span><span class=w>
+</span><span class=w>          </span>- istio-system<span class=w>
+</span><span class=w> 
+</span><span class=w>      </span><span class=k>relabel_configs</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__meta_kubernetes_service_name<span class=p>,</span><span class=w> </span>__meta_kubernetes_endpoint_port_name<span class=p>]</span><span class=w>
+</span><span class=w>        </span><span class=k>action</span><span class=p>:</span><span class=w> </span>keep<span class=w>
+</span><span class=w>        </span><span class=k>regex</span><span class=p>:</span><span class=w> </span>istio-citadel;http-monitoring<span class=w>
+</span><span class=w> 
+</span><span class=w>    </span><span class=c># scrape config for API servers</span><span class=w>
+</span><span class=w>    </span>- <span class=k>job_name</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;kubernetes-apiservers&#39;</span><span class=w>
+</span><span class=w>      </span><span class=k>kubernetes_sd_configs</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span>- <span class=k>role</span><span class=p>:</span><span class=w> </span>endpoints<span class=w>
+</span><span class=w>        </span><span class=k>namespaces</span><span class=p>:</span><span class=w>
+</span><span class=w>          </span><span class=k>names</span><span class=p>:</span><span class=w>
+</span><span class=w>          </span>- default<span class=w>
+</span><span class=w>      </span><span class=k>scheme</span><span class=p>:</span><span class=w> </span>https<span class=w>
+</span><span class=w>      </span><span class=k>tls_config</span><span class=p>:</span><span class=w>
+</span><span class=w>        </span><span class=k>ca_file</span><span class=p>:</span><span class=w> </span>/var/run/secrets/kubernetes.io/serviceaccount/ca.crt<span class=w>
+</span><span class=w>      </span><span class=k>bearer_token_file</span><span class=p>:</span><span class=w> </span>/var/run/secrets/kubernetes.io/serviceaccount/token<span class=w>
+</span><span class=w>      </span><span class=k>relabel_configs</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__meta_kubernetes_service_name<span class=p>,</span><span class=w> </span>__meta_kubernetes_endpoint_port_name<span class=p>]</span><span class=w>
+</span><span class=w>        </span><span class=k>action</span><span class=p>:</span><span class=w> </span>keep<span class=w>
+</span><span class=w>        </span><span class=k>regex</span><span class=p>:</span><span class=w> </span>kubernetes;https<span class=w>
+</span><span class=w> 
+</span><span class=w>    </span><span class=c># scrape config for nodes (kubelet)</span><span class=w>
+</span><span class=w>    </span>- <span class=k>job_name</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;kubernetes-nodes&#39;</span><span class=w>
+</span><span class=w>      </span><span class=k>scheme</span><span class=p>:</span><span class=w> </span>https<span class=w>
+</span><span class=w>      </span><span class=k>tls_config</span><span class=p>:</span><span class=w>
+</span><span class=w>        </span><span class=k>ca_file</span><span class=p>:</span><span class=w> </span>/var/run/secrets/kubernetes.io/serviceaccount/ca.crt<span class=w>
+</span><span class=w>      </span><span class=k>bearer_token_file</span><span class=p>:</span><span class=w> </span>/var/run/secrets/kubernetes.io/serviceaccount/token<span class=w>
+</span><span class=w>      </span><span class=k>kubernetes_sd_configs</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span>- <span class=k>role</span><span class=p>:</span><span class=w> </span>node<span class=w>
+</span><span class=w>      </span><span class=k>relabel_configs</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span>- <span class=k>action</span><span class=p>:</span><span class=w> </span>labelmap<span class=w>
+</span><span class=w>        </span><span class=k>regex</span><span class=p>:</span><span class=w> </span>__meta_kubernetes_node_label_(.+)<span class=w>
+</span><span class=w>      </span>- <span class=k>target_label</span><span class=p>:</span><span class=w> </span>__address__<span class=w>
+</span><span class=w>        </span><span class=k>replacement</span><span class=p>:</span><span class=w> </span>kubernetes.default.svc<span class=p>:</span><span class=m>443</span><span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__meta_kubernetes_node_name<span class=p>]</span><span class=w>
+</span><span class=w>        </span><span class=k>regex</span><span class=p>:</span><span class=w> </span>(.+)<span class=w>
+</span><span class=w>        </span><span class=k>target_label</span><span class=p>:</span><span class=w> </span>__metrics_path__<span class=w>
+</span><span class=w>        </span><span class=k>replacement</span><span class=p>:</span><span class=w> </span>/api/v1/nodes/${<span class=m>1</span>}/proxy/metrics<span class=w>
+</span><span class=w> 
+</span><span class=w>    </span><span class=c># Scrape config for Kubelet cAdvisor.</span><span class=w>
+</span><span class=w>    </span><span class=c>#</span><span class=w>
+</span><span class=w>    </span><span class=c># This is required for Kubernetes 1.7.3 and later, where cAdvisor metrics</span><span class=w>
+</span><span class=w>    </span><span class=c># (those whose names begin with &#39;container_&#39;) have been removed from the</span><span class=w>
+</span><span class=w>    </span><span class=c># Kubelet metrics endpoint.  This job scrapes the cAdvisor endpoint to</span><span class=w>
+</span><span class=w>    </span><span class=c># retrieve those metrics.</span><span class=w>
+</span><span class=w>    </span><span class=c>#</span><span class=w>
+</span><span class=w>    </span><span class=c># In Kubernetes 1.7.0-1.7.2, these metrics are only exposed on the cAdvisor</span><span class=w>
+</span><span class=w>    </span><span class=c># HTTP endpoint; use &#34;replacement: /api/v1/nodes/${1}:4194/proxy/metrics&#34;</span><span class=w>
+</span><span class=w>    </span><span class=c># in that case (and ensure cAdvisor&#39;s HTTP server hasn&#39;t been disabled with</span><span class=w>
+</span><span class=w>    </span><span class=c># the --cadvisor-port=0 Kubelet flag).</span><span class=w>
+</span><span class=w>    </span><span class=c>#</span><span class=w>
+</span><span class=w>    </span><span class=c># This job is not necessary and should be removed in Kubernetes 1.6 and</span><span class=w>
+</span><span class=w>    </span><span class=c># earlier versions, or it will cause the metrics to be scraped twice.</span><span class=w>
+</span><span class=w>    </span>- <span class=k>job_name</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;kubernetes-cadvisor&#39;</span><span class=w>
+</span><span class=w>      </span><span class=k>scheme</span><span class=p>:</span><span class=w> </span>https<span class=w>
+</span><span class=w>      </span><span class=k>tls_config</span><span class=p>:</span><span class=w>
+</span><span class=w>        </span><span class=k>ca_file</span><span class=p>:</span><span class=w> </span>/var/run/secrets/kubernetes.io/serviceaccount/ca.crt<span class=w>
+</span><span class=w>      </span><span class=k>bearer_token_file</span><span class=p>:</span><span class=w> </span>/var/run/secrets/kubernetes.io/serviceaccount/token<span class=w>
+</span><span class=w>      </span><span class=k>kubernetes_sd_configs</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span>- <span class=k>role</span><span class=p>:</span><span class=w> </span>node<span class=w>
+</span><span class=w>      </span><span class=k>relabel_configs</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span>- <span class=k>action</span><span class=p>:</span><span class=w> </span>labelmap<span class=w>
+</span><span class=w>        </span><span class=k>regex</span><span class=p>:</span><span class=w> </span>__meta_kubernetes_node_label_(.+)<span class=w>
+</span><span class=w>      </span>- <span class=k>target_label</span><span class=p>:</span><span class=w> </span>__address__<span class=w>
+</span><span class=w>        </span><span class=k>replacement</span><span class=p>:</span><span class=w> </span>kubernetes.default.svc<span class=p>:</span><span class=m>443</span><span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__meta_kubernetes_node_name<span class=p>]</span><span class=w>
+</span><span class=w>        </span><span class=k>regex</span><span class=p>:</span><span class=w> </span>(.+)<span class=w>
+</span><span class=w>        </span><span class=k>target_label</span><span class=p>:</span><span class=w> </span>__metrics_path__<span class=w>
+</span><span class=w>        </span><span class=k>replacement</span><span class=p>:</span><span class=w> </span>/api/v1/nodes/${<span class=m>1</span>}/proxy/metrics/cadvisor<span class=w>
+</span><span class=w> 
+</span><span class=w>    </span><span class=c># scrape config for service endpoints.</span><span class=w>
+</span><span class=w>    </span>- <span class=k>job_name</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;kubernetes-service-endpoints&#39;</span><span class=w>
+</span><span class=w>      </span><span class=k>kubernetes_sd_configs</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span>- <span class=k>role</span><span class=p>:</span><span class=w> </span>endpoints<span class=w>
+</span><span class=w>      </span><span class=k>relabel_configs</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__meta_kubernetes_service_annotation_prometheus_io_scrape<span class=p>]</span><span class=w>
+</span><span class=w>        </span><span class=k>action</span><span class=p>:</span><span class=w> </span>keep<span class=w>
+</span><span class=w>        </span><span class=k>regex</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__meta_kubernetes_service_annotation_prometheus_io_scheme<span class=p>]</span><span class=w>
+</span><span class=w>        </span><span class=k>action</span><span class=p>:</span><span class=w> </span>replace<span class=w>
+</span><span class=w>        </span><span class=k>target_label</span><span class=p>:</span><span class=w> </span>__scheme__<span class=w>
+</span><span class=w>        </span><span class=k>regex</span><span class=p>:</span><span class=w> </span>(https<span class=p>?</span>)<span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__meta_kubernetes_service_annotation_prometheus_io_path<span class=p>]</span><span class=w>
+</span><span class=w>        </span><span class=k>action</span><span class=p>:</span><span class=w> </span>replace<span class=w>
+</span><span class=w>        </span><span class=k>target_label</span><span class=p>:</span><span class=w> </span>__metrics_path__<span class=w>
+</span><span class=w>        </span><span class=k>regex</span><span class=p>:</span><span class=w> </span>(.+)<span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__address__<span class=p>,</span><span class=w> </span>__meta_kubernetes_service_annotation_prometheus_io_port<span class=p>]</span><span class=w>
+</span><span class=w>        </span><span class=k>action</span><span class=p>:</span><span class=w> </span>replace<span class=w>
+</span><span class=w>        </span><span class=k>target_label</span><span class=p>:</span><span class=w> </span>__address__<span class=w>
+</span><span class=w>        </span><span class=k>regex</span><span class=p>:</span><span class=w> </span>(<span class=p>[</span>^<span class=p>:]</span>+)(<span class=p>?::</span>\d+)<span class=p>?</span>;(\d+)<span class=w>
+</span><span class=w>        </span><span class=k>replacement</span><span class=p>:</span><span class=w> </span>$<span class=m>1</span><span class=p>:</span>$<span class=m>2</span><span class=w>
+</span><span class=w>      </span>- <span class=k>action</span><span class=p>:</span><span class=w> </span>labelmap<span class=w>
+</span><span class=w>        </span><span class=k>regex</span><span class=p>:</span><span class=w> </span>__meta_kubernetes_service_label_(.+)<span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__meta_kubernetes_namespace<span class=p>]</span><span class=w>
+</span><span class=w>        </span><span class=k>action</span><span class=p>:</span><span class=w> </span>replace<span class=w>
+</span><span class=w>        </span><span class=k>target_label</span><span class=p>:</span><span class=w> </span>kubernetes_namespace<span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__meta_kubernetes_service_name<span class=p>]</span><span class=w>
+</span><span class=w>        </span><span class=k>action</span><span class=p>:</span><span class=w> </span>replace<span class=w>
+</span><span class=w>        </span><span class=k>target_label</span><span class=p>:</span><span class=w> </span>kubernetes_name<span class=w>
+</span><span class=w> 
+</span><span class=w>    </span>- <span class=k>job_name</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;kubernetes-pods&#39;</span><span class=w>
+</span><span class=w>      </span><span class=k>kubernetes_sd_configs</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span>- <span class=k>role</span><span class=p>:</span><span class=w> </span>pod<span class=w>
+</span><span class=w>      </span><span class=k>relabel_configs</span><span class=p>:</span><span class=w>  </span><span class=c># If first two labels are present, pod should be scraped  by the istio-secure job.</span><span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__meta_kubernetes_pod_annotation_prometheus_io_scrape<span class=p>]</span><span class=w>
+</span><span class=w>        </span><span class=k>action</span><span class=p>:</span><span class=w> </span>keep<span class=w>
+</span><span class=w>        </span><span class=k>regex</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>      </span><span class=c># Keep target if there&#39;s no sidecar or if prometheus.io/scheme is explicitly set to &#34;http&#34;</span><span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__meta_kubernetes_pod_annotation_sidecar_istio_io_status<span class=p>,</span><span class=w> </span>__meta_kubernetes_pod_annotation_prometheus_io_scheme<span class=p>]</span><span class=w>
+</span><span class=w>        </span><span class=k>action</span><span class=p>:</span><span class=w> </span>keep<span class=w>
+</span><span class=w>        </span><span class=k>regex</span><span class=p>:</span><span class=w> </span>((;.<span class=cp>*)|(.*;http))</span><span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__meta_kubernetes_pod_annotation_istio_mtls<span class=p>]</span><span class=w>
+</span><span class=w>        </span><span class=k>action</span><span class=p>:</span><span class=w> </span>drop<span class=w>
+</span><span class=w>        </span><span class=k>regex</span><span class=p>:</span><span class=w> </span>(<span class=kc>true</span>)<span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__meta_kubernetes_pod_annotation_prometheus_io_path<span class=p>]</span><span class=w>
+</span><span class=w>        </span><span class=k>action</span><span class=p>:</span><span class=w> </span>replace<span class=w>
+</span><span class=w>        </span><span class=k>target_label</span><span class=p>:</span><span class=w> </span>__metrics_path__<span class=w>
+</span><span class=w>        </span><span class=k>regex</span><span class=p>:</span><span class=w> </span>(.+)<span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__address__<span class=p>,</span><span class=w> </span>__meta_kubernetes_pod_annotation_prometheus_io_port<span class=p>]</span><span class=w>
+</span><span class=w>        </span><span class=k>action</span><span class=p>:</span><span class=w> </span>replace<span class=w>
+</span><span class=w>        </span><span class=k>regex</span><span class=p>:</span><span class=w> </span>(<span class=p>[</span>^<span class=p>:]</span>+)(<span class=p>?::</span>\d+)<span class=p>?</span>;(\d+)<span class=w>
+</span><span class=w>        </span><span class=k>replacement</span><span class=p>:</span><span class=w> </span>$<span class=m>1</span><span class=p>:</span>$<span class=m>2</span><span class=w>
+</span><span class=w>        </span><span class=k>target_label</span><span class=p>:</span><span class=w> </span>__address__<span class=w>
+</span><span class=w>      </span>- <span class=k>action</span><span class=p>:</span><span class=w> </span>labelmap<span class=w>
+</span><span class=w>        </span><span class=k>regex</span><span class=p>:</span><span class=w> </span>__meta_kubernetes_pod_label_(.+)<span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__meta_kubernetes_namespace<span class=p>]</span><span class=w>
+</span><span class=w>        </span><span class=k>action</span><span class=p>:</span><span class=w> </span>replace<span class=w>
+</span><span class=w>        </span><span class=k>target_label</span><span class=p>:</span><span class=w> </span>namespace<span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__meta_kubernetes_pod_name<span class=p>]</span><span class=w>
+</span><span class=w>        </span><span class=k>action</span><span class=p>:</span><span class=w> </span>replace<span class=w>
+</span><span class=w>        </span><span class=k>target_label</span><span class=p>:</span><span class=w> </span>pod_name<span class=w>
+</span><span class=w> 
+</span><span class=w>    </span>- <span class=k>job_name</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;kubernetes-pods-istio-secure&#39;</span><span class=w>
+</span><span class=w>      </span><span class=k>scheme</span><span class=p>:</span><span class=w> </span>https<span class=w>
+</span><span class=w>      </span><span class=k>tls_config</span><span class=p>:</span><span class=w>
+</span><span class=w>        </span><span class=k>ca_file</span><span class=p>:</span><span class=w> </span>/etc/istio-certs/root-cert.pem<span class=w>
+</span><span class=w>        </span><span class=k>cert_file</span><span class=p>:</span><span class=w> </span>/etc/istio-certs/cert-chain.pem<span class=w>
+</span><span class=w>        </span><span class=k>key_file</span><span class=p>:</span><span class=w> </span>/etc/istio-certs/key.pem<span class=w>
+</span><span class=w>        </span><span class=k>insecure_skip_verify</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>  </span><span class=c># prometheus does not support secure naming.</span><span class=w>
+</span><span class=w>      </span><span class=k>kubernetes_sd_configs</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span>- <span class=k>role</span><span class=p>:</span><span class=w> </span>pod<span class=w>
+</span><span class=w>      </span><span class=k>relabel_configs</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__meta_kubernetes_pod_annotation_prometheus_io_scrape<span class=p>]</span><span class=w>
+</span><span class=w>        </span><span class=k>action</span><span class=p>:</span><span class=w> </span>keep<span class=w>
+</span><span class=w>        </span><span class=k>regex</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span><span class=w>      </span><span class=c># sidecar status annotation is added by sidecar injector and</span><span class=w>
+</span><span class=w>      </span><span class=c># istio_workload_mtls_ability can be specifically placed on a pod to indicate its ability to receive mtls traffic.</span><span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__meta_kubernetes_pod_annotation_sidecar_istio_io_status<span class=p>,</span><span class=w> </span>__meta_kubernetes_pod_annotation_istio_mtls<span class=p>]</span><span class=w>
+</span><span class=w>        </span><span class=k>action</span><span class=p>:</span><span class=w> </span>keep<span class=w>
+</span><span class=w>        </span><span class=k>regex</span><span class=p>:</span><span class=w> </span>((<span class=p>[</span>^;<span class=p>]</span>+);(<span class=p>[</span>^;<span class=p>]</span><span class=cp>*))|(([^;]*);(true))</span><span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__meta_kubernetes_pod_annotation_prometheus_io_scheme<span class=p>]</span><span class=w>
+</span><span class=w>        </span><span class=k>action</span><span class=p>:</span><span class=w> </span>drop<span class=w>
+</span><span class=w>        </span><span class=k>regex</span><span class=p>:</span><span class=w> </span>(http)<span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__meta_kubernetes_pod_annotation_prometheus_io_path<span class=p>]</span><span class=w>
+</span><span class=w>        </span><span class=k>action</span><span class=p>:</span><span class=w> </span>replace<span class=w>
+</span><span class=w>        </span><span class=k>target_label</span><span class=p>:</span><span class=w> </span>__metrics_path__<span class=w>
+</span><span class=w>        </span><span class=k>regex</span><span class=p>:</span><span class=w> </span>(.+)<span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__address__<span class=p>]</span><span class=w>  </span><span class=c># Only keep address that is host:port</span><span class=w>
+</span><span class=w>        </span><span class=k>action</span><span class=p>:</span><span class=w> </span>keep<span class=w>    </span><span class=c># otherwise an extra target with &#39;:443&#39; is added for https scheme</span><span class=w>
+</span><span class=w>        </span><span class=k>regex</span><span class=p>:</span><span class=w> </span>(<span class=p>[</span>^<span class=p>:]</span>+)<span class=p>:</span>(\d+)<span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__address__<span class=p>,</span><span class=w> </span>__meta_kubernetes_pod_annotation_prometheus_io_port<span class=p>]</span><span class=w>
+</span><span class=w>        </span><span class=k>action</span><span class=p>:</span><span class=w> </span>replace<span class=w>
+</span><span class=w>        </span><span class=k>regex</span><span class=p>:</span><span class=w> </span>(<span class=p>[</span>^<span class=p>:]</span>+)(<span class=p>?::</span>\d+)<span class=p>?</span>;(\d+)<span class=w>
+</span><span class=w>        </span><span class=k>replacement</span><span class=p>:</span><span class=w> </span>$<span class=m>1</span><span class=p>:</span>$<span class=m>2</span><span class=w>
+</span><span class=w>        </span><span class=k>target_label</span><span class=p>:</span><span class=w> </span>__address__<span class=w>
+</span><span class=w>      </span>- <span class=k>action</span><span class=p>:</span><span class=w> </span>labelmap<span class=w>
+</span><span class=w>        </span><span class=k>regex</span><span class=p>:</span><span class=w> </span>__meta_kubernetes_pod_label_(.+)<span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__meta_kubernetes_namespace<span class=p>]</span><span class=w>
+</span><span class=w>        </span><span class=k>action</span><span class=p>:</span><span class=w> </span>replace<span class=w>
+</span><span class=w>        </span><span class=k>target_label</span><span class=p>:</span><span class=w> </span>namespace<span class=w>
+</span><span class=w>      </span>- <span class=k>source_labels</span><span class=p>:</span><span class=w> </span><span class=p>[</span>__meta_kubernetes_pod_name<span class=p>]</span><span class=w>
+</span><span class=w>        </span><span class=k>action</span><span class=p>:</span><span class=w> </span>replace<span class=w>
+</span><span class=w>        </span><span class=k>target_label</span><span class=p>:</span><span class=w> </span>pod_name<span class=w>
+</span><span class=w></span><span class=k>kind</span><span class=p>:</span><span class=w> </span>ConfigMap<span class=w>
+</span><span class=w></span><span class=k>metadata</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span><span class=k>creationTimestamp</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;2020-02-17T15:09:41Z&#34;</span><span class=w>
+</span><span class=w>  </span><span class=k>labels</span><span class=p>:</span><span class=w>
+</span><span class=w>    </span><span class=k>app</span><span class=p>:</span><span class=w> </span>prometheus<span class=w>
+</span><span class=w>    </span><span class=k>chart</span><span class=p>:</span><span class=w> </span>prometheus<span class=w>
+</span><span class=w>    </span><span class=k>heritage</span><span class=p>:</span><span class=w> </span>Helm<span class=w>
+</span><span class=w>    </span><span class=k>release</span><span class=p>:</span><span class=w> </span>istio<span class=w>
+</span><span class=w>  </span><span class=k>name</span><span class=p>:</span><span class=w> </span>prometheus<span class=w>
+</span><span class=w>  </span><span class=k>namespace</span><span class=p>:</span><span class=w> </span>istio-system<span class=w>
+</span><span class=w>  </span><span class=k>resourceVersion</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;1885&#34;</span><span class=w>
+</span><span class=w>  </span><span class=k>selfLink</span><span class=p>:</span><span class=w> </span>/api/v1/namespaces/istio-system/configmaps/prometheus<span class=w>
+</span><span class=w>  </span><span class=k>uid</span><span class=p>:</span><span class=w> </span>69739c5d-8cd8-44fd-ae12-a08bf80b3600<span class=w>
+</span></code></pre></td></tr></table></div></div><p>以上配置中定义了 Prometheus 需要抓取目标数据的参数，例如监控集群中的哪些 Pod，获取 Metrics 的接口路径等。</p><p>访问 Prometheus：http://10.12.1.100:31957/</p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190742237.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190742237.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190742237.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190742237.png 2x" data-sizes=auto alt=image-20200511190742237 title=image-20200511190742237></p><p>在网页顶部的 Expression 输入框中输入 “istio”，Prometheus 会自动补齐并显示从 Envoy 收集的所有相关指标。选择或输入 “istio_request_total”，</p><p>然后单击 Execute 按钮，检索得到 Istio 请求总数的 Metrics。</p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190804761.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190804761.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190804761.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190804761.png 2x" data-sizes=auto alt=image-20200511190804761 title=image-20200511190804761></p><p>如果没有数据返回，则需要访问前台页面产生 Metrics，并重新检索指标数据。Prometheus 也支持组合查询表达式，例如想查询过去 5 分钟对</p><p>advertisement 服务的请求成功率，则输入如下表达式：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>sum<span class=o>(</span>rate<span class=o>(</span>istio_requests_total<span class=o>{</span>
+  <span class=nv>reporter</span><span class=o>=</span><span class=s2>&#34;destination&#34;</span>,
+  <span class=nv>destination_service_namespace</span><span class=o>=</span><span class=s2>&#34;weather&#34;</span>,
+  <span class=nv>destination_service_name</span><span class=o>=</span><span class=s2>&#34;advertisement&#34;</span>,
+  response_code!~<span class=s2>&#34;5.x&#34;</span>
+<span class=o>}[</span>5m<span class=o>]</span>
+<span class=o>))</span>/sum<span class=o>(</span>rate<span class=o>(</span>istio_requests_total<span class=o>{</span>
+  <span class=nv>reporter</span><span class=o>=</span><span class=s2>&#34;destination&#34;</span>,
+  <span class=nv>destination_service_namespace</span><span class=o>=</span><span class=s2>&#34;weather&#34;</span>,
+  <span class=nv>destination_service_name</span><span class=o>=</span><span class=s2>&#34;advertisement&#34;</span>,
+  response_code!~<span class=s2>&#34;5.x&#34;</span>
+<span class=o>}[</span>5m<span class=o>]</span>
+<span class=o>))</span> * <span class=m>100</span>
+</code></pre></td></tr></table></div></div><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190827440.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190827440.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190827440.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190827440.png 2x" data-sizes=auto alt=image-20200511190827440 title=image-20200511190827440></p><p>如果 Istio 内置的 Metrics 不能满足需求，则用户还可以创建自定义的 Metrics，例如需要查询请求的 Method、Path 和 Useragent 等属性，执行如下命令：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>kubectl apply -f chapter-files/telemetry/customer-request-count.yaml
+</code></pre></td></tr></table></div></div><p>文件内容如下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-yaml data-lang=yaml><span class=k>apiVersion</span><span class=p>:</span><span class=w> </span>config.istio.io/v1alpha2<span class=w>
+</span><span class=w></span><span class=k>kind</span><span class=p>:</span><span class=w> </span>instance<span class=w>
+</span><span class=w></span><span class=k>metadata</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span><span class=k>name</span><span class=p>:</span><span class=w> </span>customerrequestcount<span class=w>
+</span><span class=w>  </span><span class=k>namespace</span><span class=p>:</span><span class=w> </span>istio-system<span class=w>
+</span><span class=w></span><span class=k>spec</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span><span class=k>compiledTemplate</span><span class=p>:</span><span class=w> </span>metric<span class=w>
+</span><span class=w>  </span><span class=k>params</span><span class=p>:</span><span class=w>
+</span><span class=w>    </span><span class=k>value</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;1&#34;</span><span class=w>
+</span><span class=w>    </span><span class=k>dimensions</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span><span class=k>method</span><span class=p>:</span><span class=w> </span>request.method<span class=w> </span>|<span class=w> </span><span class=s2>&#34;unknown&#34;</span><span class=w>
+</span><span class=w>      </span><span class=k>path</span><span class=p>:</span><span class=w> </span>request.path<span class=w> </span>|<span class=w> </span><span class=s2>&#34;unknown&#34;</span><span class=w>
+</span><span class=w>      </span><span class=k>useragent</span><span class=p>:</span><span class=w> </span>request.useragent<span class=w> </span>|<span class=w> </span><span class=s2>&#34;unknown&#34;</span><span class=w>
+</span><span class=w>      </span><span class=k>destination</span><span class=p>:</span><span class=w> </span>destination.service.name<span class=w> </span>|<span class=w> </span><span class=s2>&#34;unknown&#34;</span><span class=w>
+</span><span class=w>      </span><span class=k>code</span><span class=p>:</span><span class=w> </span>response.code<span class=w> </span>|<span class=w> </span><span class=m>200</span><span class=w>
+</span><span class=w>    </span><span class=k>monitored_resource_type</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;&#34;UNSPECIFIED&#34;&#39;</span><span class=w>
+</span><span class=w></span>---<span class=w>
+</span><span class=w></span><span class=k>apiVersion</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;config.istio.io/v1alpha2&#34;</span><span class=w>
+</span><span class=w></span><span class=k>kind</span><span class=p>:</span><span class=w> </span>handler<span class=w>
+</span><span class=w></span><span class=k>metadata</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span><span class=k>name</span><span class=p>:</span><span class=w> </span>prometheus<span class=w>
+</span><span class=w>  </span><span class=k>namespace</span><span class=p>:</span><span class=w> </span>istio-system<span class=w>
+</span><span class=w></span><span class=k>spec</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span><span class=k>compiledAdapter</span><span class=p>:</span><span class=w> </span>prometheus<span class=w>
+</span><span class=w>  </span><span class=k>params</span><span class=p>:</span><span class=w>
+</span><span class=w>    </span><span class=k>metrics</span><span class=p>:</span><span class=w>
+</span><span class=w>    </span>- <span class=k>name</span><span class=p>:</span><span class=w> </span>customer_request_count<span class=w>
+</span><span class=w>      </span><span class=k>instance_name</span><span class=p>:</span><span class=w> </span>customerrequestcount.instance.istio-system<span class=w>
+</span><span class=w>      </span><span class=k>kind</span><span class=p>:</span><span class=w> </span>COUNTER<span class=w>
+</span><span class=w>      </span><span class=k>label_names</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span>- method<span class=w>
+</span><span class=w>      </span>- path<span class=w>
+</span><span class=w>      </span>- useragent<span class=w>
+</span><span class=w>      </span>- destination<span class=w>
+</span><span class=w>      </span>- code<span class=w>
+</span><span class=w></span>---<span class=w>
+</span><span class=w></span><span class=k>apiVersion</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;config.istio.io/v1alpha2&#34;</span><span class=w>
+</span><span class=w></span><span class=k>kind</span><span class=p>:</span><span class=w> </span>rule<span class=w>
+</span><span class=w></span><span class=k>metadata</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span><span class=k>name</span><span class=p>:</span><span class=w> </span>customerprom<span class=w>
+</span><span class=w>  </span><span class=k>namespace</span><span class=p>:</span><span class=w> </span>istio-system<span class=w>
+</span><span class=w></span><span class=k>spec</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span><span class=k>actions</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span>- <span class=k>handler</span><span class=p>:</span><span class=w> </span>prometheus<span class=w>
+</span><span class=w>    </span><span class=k>instances</span><span class=p>:</span><span class=w>
+</span><span class=w>    </span>- customerrequestcount<span class=w>
+</span></code></pre></td></tr></table></div></div><p>从浏览器前台页面产生流量，在 Prometheus 界面输入 “istio_customer_request_count”，执行如下：</p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190856956.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190856956.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190856956.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190856956.png 2x" data-sizes=auto alt=image-20200511190856956 title=image-20200511190856956></p><h1 id=4-grafana>4. Grafana</h1><p>Istio 安装包携带了预置的 Grafana 组件，但默认不安装。需启用 Grafana 并配置对外访问方式。</p><p>访问 Grafana：http://10.12.1.100:30826/，如下图，可以看到 Istio 定制的 Grafana 集成了包括网络、服务、工作负载和 Istio核心组件</p><p>在内的多个 Dashboard。</p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190921564.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190921564.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190921564.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190921564.png 2x" data-sizes=auto alt=image-20200511190921564 title=image-20200511190921564></p><h3 id=istio-mesh-dashboard>Istio Mesh Dashboard</h3><p>提供了网格的全局摘要视图，在多次访问应用产生流量后，可以在仪表盘实时看到全局的数据请求量、成功率，以及服务和工作负载</p><p>的列表等信息。</p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190940038.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190940038.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190940038.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511190940038.png 2x" data-sizes=auto alt=image-20200511190940038 title=image-20200511190940038></p><h3 id=istio-service-dashboard>Istio Service Dashboard</h3><p>提供了每个服务的 HTTP、gRPC 和 TCP 的请求和响应的度量指标，以及有关此服务的客户端和服务端工作负载的指标。</p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191000766.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191000766.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191000766.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191000766.png 2x" data-sizes=auto alt=image-20200511191000766 title=image-20200511191000766></p><h3 id=istio-workload-dashboard>Istio Workload Dashboard</h3><p>提供了每个工作负载请求流量的动态数据，以及入站和出站的相关指标。</p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191034525.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191034525.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191034525.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191034525.png 2x" data-sizes=auto alt=image-20200511191034525 title=image-20200511191034525></p><h3 id=istio-performance-dashboard>Istio Performance Dashboard</h3><p>用来监控 istio-proxy、istio-telemetry、istio-policy 和 istio-ingressgateway 的 vCPU、内存和每秒传输字节数等关键指标，</p><p>用来测量和评估 Istio 的整体性能表现。</p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191056128.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191056128.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191056128.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191056128.png 2x" data-sizes=auto alt=image-20200511191056128 title=image-20200511191056128></p><h3 id=自定义-dashboard>自定义 Dashboard</h3><p>Istio 默认集成的仪表盘缺少对 Kubernetes Pod 的资源使用情况的展示，用户需要创建自定义的仪表盘来监控 Pod 的相关指标。导入</p><p>chapter-files/telemetry/Istio-USE-dashboard.json。</p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191119803.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191119803.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191119803.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191119803.png 2x" data-sizes=auto alt=image-20200511191119803 title=image-20200511191119803></p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191159590.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191159590.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191159590.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191159590.png 2x" data-sizes=auto alt=image-20200511191159590 title=image-20200511191159590></p><p>可以看到，这个 Dashboard 显示了指定命名空间下所有 Pod 的 CPU、内存和网络 I/O 的使用情况。也可以在 Grafana 官网查找其他开发</p><p>人员或组织公开发布的配置文件进行使用。如 &ldquo;<a href=https://grafana.com/grafana/dashboards/1471%22>https://grafana.com/grafana/dashboards/1471"</a> 展示了指定命名空间下容器的关键 Metrics:</p><p>request rate、error rate、response times、pod count、cpu 和 memory usage。</p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191230600.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191230600.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191230600.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191230600.png 2x" data-sizes=auto alt=image-20200511191230600 title=image-20200511191230600></p><h1 id=5-服务网格监控>5. 服务网格监控</h1><p>Istio 默认不安装 Kiali 组件，需启用 Kiali 并配置对外访问方式。</p><p>Kiali：http://10.12.1.100:32143/，输入用户名 admin 和密码 admin。</p><p>Kiali 总览视图展示了集群中所有命名空间的全局视图，以及各个命名空间下应用的数量、健康状态和其他功能视图的链接图标。</p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191253964.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191253964.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191253964.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191253964.png 2x" data-sizes=auto alt=image-20200511191253964 title=image-20200511191253964></p><p>&ldquo;Graph&rdquo; 菜单项可以查看服务拓扑关系，深入了解服务间如何通讯。可从中获取实时的动态流量数据，包括 HTTP/TCP 的每秒请求数、流量比例、</p><p>成功率及不同返回码的占比。</p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191317682.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191317682.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191317682.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191317682.png 2x" data-sizes=auto alt=image-20200511191317682 title=image-20200511191317682></p><p>Kiali 中，应用指具有相同标签的服务和工作负载的集合，是一个虚拟概念。如下为应用详情页，可以看到与应用关联的服务和工作负载、健康状况、</p><p>入站和出站流量的请求和响应指标等信息。</p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191340355.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191340355.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191340355.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191340355.png 2x" data-sizes=auto alt=image-20200511191340355 title=image-20200511191340355></p><p>工作负载详情页包含了负载的标签、创建时间、健康状态、关联的 Pod 信息、Service 信息、Istio 资源对象 和 Metrics 等。</p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191402208.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191402208.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191402208.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191402208.png 2x" data-sizes=auto alt=image-20200511191402208 title=image-20200511191402208></p><p>服务详情页展示了服务的标签、端口信息、工作负载、健康状态、Istio 资源对象 和 Metrics等。</p><p>用户通过上面的信息可以检查 Pod 和 服务是否满足 Istio 规范，如 Service 是否定义了包含协议的端口名称、</p><p>Deployment 是否带有正确的 app 和 version 标签等。</p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191427619.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191427619.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191427619.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191427619.png 2x" data-sizes=auto alt=image-20200511191427619 title=image-20200511191427619></p><p>Istio Config 显示了网格中所有的 Istio 资源和规则，用户可以对单个配置进行查看、修改、删除操作。同时，Kiali 会对网格内的</p><p>Istio 规则进行在线的语法校验。如果出现网格范围内的配置冲突，Kiali 就会按照严重程度（Warning 或 Error）高亮显示这些冲突</p><p>提示用户。如 VituralService 绑定的 Gateway 不存在；Subset 没有定义；同一个主机存在定义了不同 Subset 的多个 DestinationRule 等。</p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191451819.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191451819.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191451819.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511191451819.png 2x" data-sizes=auto alt=image-20200511191451819 title=image-20200511191451819></p></div><div class=post-footer id=post-footer><div class=post-info><div class=post-info-line><div class=post-info-mod><span>更新于 2020-05-11</span></div><div class=post-info-license></div></div><div class=post-info-line><div class=post-info-md></div><div class=post-info-share><span></span></div></div></div><div class=post-info-more><section class=post-tags><i class="fas fa-tags fa-fw"></i>&nbsp;<a href=/tags/istio/>Istio</a>,&nbsp;<a href=/tags/%E5%AE%9E%E9%AA%8C/>实验</a></section><section><span><a href=javascript:void(0); onclick=window.history.back();>返回</a></span>&nbsp;|&nbsp;<span><a href=/>主页</a></span></section></div><div class=post-nav><a href=/helm3%E9%83%A8%E7%BD%B2istio-1.4/ class=prev rel=prev title="Helm3部署Istio 1.4"><i class="fas fa-angle-left fa-fw"></i>Helm3部署Istio 1.4</a>
+<a href=/%E7%81%B0%E5%BA%A6%E5%8F%91%E5%B8%83/ class=next rel=next title=灰度发布>灰度发布<i class="fas fa-angle-right fa-fw"></i></a></div></div><div id=comments><div id=gitalk class=comment></div><noscript>Please enable JavaScript to view the comments powered by <a href=https://github.com/gitalk/gitalk></a>Gitalk</a>.</noscript></div></article></div></main><footer class=footer><div class=footer-container><div class=footer-line>由 <a href=https://gohugo.io/ target=_blank rel="noopener noreffer" title="Hugo 0.71.1">Hugo</a> 强力驱动 | 主题 - <a href=https://github.com/dillonzq/LoveIt target=_blank rel="noopener noreffer" title="LoveIt 0.2.9"><i class="far fa-kiss-wink-heart fa-fw"></i>LoveIt</a></div><div class=footer-line><i class="far fa-copyright fa-fw"></i><span itemprop=copyrightYear>2019 - 2020</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=garroshh.me target=_blank>garroshh</a></span>&nbsp;|&nbsp;<span class=license><a rel="license external nofollow noopener noreffer" href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank>CC BY-NC 4.0</a></span></div></div></footer></div><div id=fixed-buttons><a href=# id=back-to-top class=fixed-button title=回到顶部><i class="fas fa-arrow-up fa-fw"></i></a><a href=# id=view-comments class=fixed-button title=查看评论><i class="fas fa-comment fa-fw"></i></a></div><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/gitalk@1.6.2/dist/gitalk.min.css><script type=text/javascript src=https://cdn.jsdelivr.net/npm/gitalk@1.6.2/dist/gitalk.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/smooth-scroll@16.1.3/dist/smooth-scroll.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/autocomplete.js@0.37.1/dist/autocomplete.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/algoliasearch@4.2.0/dist/algoliasearch-lite.umd.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/lazysizes@5.2.0/lazysizes.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/typeit@7.0.4/dist/typeit.min.js></script><script type=text/javascript>window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":10},"comment":{"gitalk":{"admin":["garroshh"],"clientID":"765aeb40ecd9058c4ab8","clientSecret":"824af1ecb35c665e4d7fb379211bb748841e96a1","id":"2020-05-11T19:01:49+08:00","owner":"garroshh","repo":"garroshh.github.io","title":"流量监控"}},"data":{"id-1":"Garroshh's Blog","id-2":"Garroshh's Blog"},"search":{"algoliaAppID":"PASDMWALPK","algoliaIndex":"index.zh-cn","algoliaSearchKey":"b42948e51daaa93df92381c8e2ac0f93","highlightTag":"em","maxResultLength":10,"noResultsFound":"没有找到结果","snippetLength":50,"type":"algolia"},"typeit":{"cursorChar":"|","cursorSpeed":1000,"data":{"id-1":["id-1"],"id-2":["id-2"]},"duration":-1,"speed":100}};</script><script type=text/javascript src=/js/theme.min.js></script></body></html>

@@ -1,0 +1,258 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noodp"><meta http-equiv=x-ua-compatible content="IE=edge, chrome=1"><title>Kubeadm搭建Kubernetes集群 - LoveIt</title><meta name=Description content="关于 LoveIt 主题"><meta property="og:title" content="Kubeadm搭建Kubernetes集群"><meta property="og:description" content="1. 机器配置 OS 主机名 配置 ip Centos7(Docker 19.03.5) m-100 4C8G 10.12.1.100 Centos7(Docker 19.03.5) w-101 4C8G 10.12.1.101 Centos7(Docker 19.03.5) w-102 4C8G 10.12.1.102 2. 主节点和工作节点配置 安装 kubeadm, kubelet 和 kubectl，其中 kubectl 工作节点可选择性安装 1 2 3 4 5 6"><meta property="og:type" content="article"><meta property="og:url" content="https://garroshh.me/kubeadm%E6%90%AD%E5%BB%BAkubernetes%E9%9B%86%E7%BE%A4/"><meta property="og:image" content="https://garroshh.me/logo.png"><meta property="article:published_time" content="2020-05-11T18:40:05+08:00"><meta property="article:modified_time" content="2020-05-11T18:40:05+08:00"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://garroshh.me/logo.png"><meta name=twitter:title content="Kubeadm搭建Kubernetes集群"><meta name=twitter:description content="1. 机器配置 OS 主机名 配置 ip Centos7(Docker 19.03.5) m-100 4C8G 10.12.1.100 Centos7(Docker 19.03.5) w-101 4C8G 10.12.1.101 Centos7(Docker 19.03.5) w-102 4C8G 10.12.1.102 2. 主节点和工作节点配置 安装 kubeadm, kubelet 和 kubectl，其中 kubectl 工作节点可选择性安装 1 2 3 4 5 6"><meta name=application-name content="LoveIt"><meta name=apple-mobile-web-app-title content="LoveIt"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://garroshh.me/kubeadm%E6%90%AD%E5%BB%BAkubernetes%E9%9B%86%E7%BE%A4/><link rel=prev href=https://garroshh.me/%E7%BD%91%E6%A0%BC%E5%8F%AF%E8%A7%86%E5%8C%96/><link rel=next href=https://garroshh.me/helm3%E9%83%A8%E7%BD%B2istio-1.4/><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css><link rel=stylesheet href=/css/style.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/animate.css@3.7.2/animate.min.css><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"Kubeadm搭建Kubernetes集群","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/garroshh.me\/kubeadm%E6%90%AD%E5%BB%BAkubernetes%E9%9B%86%E7%BE%A4\/"},"image":{"@type":"ImageObject","url":"https:\/\/garroshh.me\/cover.png","width":800,"height":600},"genre":"posts","keywords":"Istio, 实验","wordcount":1099,"url":"https:\/\/garroshh.me\/kubeadm%E6%90%AD%E5%BB%BAkubernetes%E9%9B%86%E7%BE%A4\/","datePublished":"2020-05-11T18:40:05+08:00","dateModified":"2020-05-11T18:40:05+08:00","license":"This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher":{"@type":"Organization","name":"xxxx","logo":{"@type":"ImageObject","url":"https:\/\/garroshh.me\/logo.png","width":127,"height":40}},"author":{"@type":"Person","name":"garroshh"},"description":""}</script></head><body header-desktop=fixed header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem('theme')?localStorage.getItem('theme')==='dark':('auto'==='auto'?window.matchMedia('(prefers-color-scheme: dark)').matches:'auto'==='dark'))&&document.body.setAttribute('theme','dark');</script><div id=mask></div><div class=wrapper><header class=desktop id=header-desktop><div class=header-wrapper><div class=header-title><a href=/ title=LoveIt><span class=header-title-pre><i class="far fa-kiss-wink-heart fa-fw"></i></span><span id=id-1 class=typeit></span></a></div><div class=menu><div class=menu-inner><a class=menu-item href=/posts/>所有文章 </a><a class=menu-item href=/tags/>标签 </a><a class=menu-item href=/categories/>分类 </a><a class=menu-item href=/categories/documentation/>文档 </a><a class=menu-item href=/about/>关于 </a><a class=menu-item href=https://github.com/dillonzq/LoveIt title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i></a><span class="menu-item delimiter"></span><a href=javascript:void(0); class="menu-item language" title=选择语言>简体中文<i class="fas fa-chevron-right fa-fw"></i>
+<select class=language-select id=language-select-desktop onchange="location=this.value;"><option value=/kubeadm%E6%90%AD%E5%BB%BAkubernetes%E9%9B%86%E7%BE%A4/ selected>简体中文</option></select>
+</a><span class="menu-item search" id=search-desktop><input type=text placeholder=搜索文章标题或内容... id=search-input-desktop>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-desktop title=搜索><i class="fas fa-search fa-fw"></i></a><a href=javascript:void(0); class="search-button search-clear" id=search-clear-desktop title=清空><i class="fas fa-times-circle fa-fw"></i></a><span class="search-button search-loading" id=search-loading-desktop><i class="fas fa-spinner fa-fw fa-spin"></i></span></span><a href=javascript:void(0); class="menu-item theme-switch" title=切换主题><i class="fas fa-adjust fa-fw"></i></a></div></div></div></header><header class=mobile id=header-mobile><div class=header-container><div class=header-wrapper><div class=header-title><a href=/ title=LoveIt><span class=header-title-pre><i class="far fa-kiss-wink-heart fa-fw"></i></span><span id=id-2 class=typeit></span></a></div><div class=menu-toggle id=menu-toggle-mobile><span></span><span></span><span></span></div></div><div class=menu id=menu-mobile><div class=search-wrapper><div class="search mobile" id=search-mobile><input type=text placeholder=搜索文章标题或内容... id=search-input-mobile>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-mobile title=搜索><i class="fas fa-search fa-fw"></i></a><a href=javascript:void(0); class="search-button search-clear" id=search-clear-mobile title=清空><i class="fas fa-times-circle fa-fw"></i></a><span class="search-button search-loading" id=search-loading-mobile><i class="fas fa-spinner fa-fw fa-spin"></i></span></div><a href=javascript:void(0); class=search-cancel id=search-cancel-mobile>取消</a></div><a class=menu-item href=/posts/>所有文章</a><a class=menu-item href=/tags/>标签</a><a class=menu-item href=/categories/>分类</a><a class=menu-item href=/categories/documentation/>文档</a><a class=menu-item href=/about/>关于</a><a class=menu-item href=https://github.com/dillonzq/LoveIt title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i></a><a href=javascript:void(0); class="menu-item theme-switch" title=切换主题>
+<i class="fas fa-adjust fa-fw"></i></a><a href=javascript:void(0); class=menu-item title=选择语言>简体中文<i class="fas fa-chevron-right fa-fw"></i>
+<select class=language-select onchange="location=this.value;"><option value=/kubeadm%E6%90%AD%E5%BB%BAkubernetes%E9%9B%86%E7%BE%A4/ selected>简体中文</option></select></a></div></div></header><div class="search-dropdown desktop"><div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile"><div id=search-dropdown-mobile></div></div><main class=main><div class=container><div class=toc id=toc-auto><h2 class=toc-title>目录</h2><div class=toc-content id=toc-content-auto></div></div><article class="page single"><h1 class="single-title animated flipInX">Kubeadm搭建Kubernetes集群</h1><div class=post-meta><div class=post-meta-line><span class=post-author><a href=garroshh.me title=Author rel=author class=author><i class="fas fa-user-circle fa-fw"></i>garroshh</a></span>&nbsp;<span class=post-category>收录于 <a href=/categories/istio/><i class="far fa-folder fa-fw"></i>Istio</a></span></div><div class=post-meta-line><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime=2020-05-11>2020-05-11</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 1099 字&nbsp;
+<i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 3 分钟&nbsp;</div></div><div class="details toc" id=toc-static kept><div class="details-summary toc-title"><span>目录</span>
+<span><i class="details-icon fas fa-angle-right"></i></span></div><div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents><ul><li><ul><li><a href=#安装-kubeadm-kubelet-和-kubectl其中-kubectl-工作节点可选择性安装>安装 kubeadm, kubelet 和 kubectl，其中 kubectl 工作节点可选择性安装</a></li><li><a href=#设置-iptables>设置 iptables</a></li><li><a href=#关闭防火墙>关闭防火墙</a></li><li><a href=#设置-cgroup-为-systemd>设置 cgroup 为 systemd</a></li><li><a href=#关闭-swapoff>关闭 swapoff</a></li><li><a href=#设置宿主机-dns>设置宿主机 dns</a></li><li><a href=#集群初始化>集群初始化</a></li><li><a href=#配置-kubectl>配置 kubectl</a></li><li><a href=#验证-kubernetes-集群>验证 kubernetes 集群</a></li></ul></li></ul><ul><li><ul><li><a href=#添加工作节点>添加工作节点</a></li><li><a href=#验证工作节点>验证工作节点</a></li><li><a href=#添加第二个工作节点>添加第二个工作节点</a></li><li><a href=#验证工作节点-1>验证工作节点</a></li></ul></li></ul></nav></div></div><div class=content id=content><h1 id=1-机器配置>1. 机器配置</h1><table><thead><tr><th align=left>OS</th><th align=left>主机名</th><th align=left>配置</th><th align=left>ip</th></tr></thead><tbody><tr><td align=left>Centos7(Docker 19.03.5)</td><td align=left>m-100</td><td align=left>4C8G</td><td align=left>10.12.1.100</td></tr><tr><td align=left>Centos7(Docker 19.03.5)</td><td align=left>w-101</td><td align=left>4C8G</td><td align=left>10.12.1.101</td></tr><tr><td align=left>Centos7(Docker 19.03.5)</td><td align=left>w-102</td><td align=left>4C8G</td><td align=left>10.12.1.102</td></tr></tbody></table><h1 id=2-主节点和工作节点配置>2. 主节点和工作节点配置</h1><h3 id=安装-kubeadm-kubelet-和-kubectl其中-kubectl-工作节点可选择性安装>安装 kubeadm, kubelet 和 kubectl，其中 kubectl 工作节点可选择性安装</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>cat <span class=s>&lt;&lt;EOF &gt; /etc/yum.repos.d/kubernetes.repo
+</span><span class=s>[kubernetes]
+</span><span class=s>name=Kubernetes
+</span><span class=s>baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+</span><span class=s>enabled=1
+</span><span class=s>gpgcheck=1
+</span><span class=s>repo_gpgcheck=1
+</span><span class=s>gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+</span><span class=s>EOF</span>
+ 
+<span class=c1># Set SELinux in permissive mode (effectively disabling it)</span>
+setenforce <span class=m>0</span>
+sed -i <span class=s1>&#39;s/^SELINUX=enforcing$/SELINUX=permissive/&#39;</span> /etc/selinux/config
+ 
+yum install -y kubelet kubeadm kubectl --disableexcludes<span class=o>=</span>kubernetes
+ 
+systemctl <span class=nb>enable</span> kubelet
+</code></pre></td></tr></table></div></div><h3 id=设置-iptables>设置 iptables</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>cat <span class=s>&lt;&lt;EOF &gt;  /etc/sysctl.d/k8s.conf
+</span><span class=s>net.bridge.bridge-nf-call-ip6tables = 1
+</span><span class=s>net.bridge.bridge-nf-call-iptables = 1
+</span><span class=s>EOF</span>
+</code></pre></td></tr></table></div></div><h3 id=关闭防火墙>关闭防火墙</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>systemctl stop firewalld
+systemctl disable firewalld
+</code></pre></td></tr></table></div></div><h3 id=设置-cgroup-为-systemd>设置 cgroup 为 systemd</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>cat &gt; /etc/docker/daemon.json <span class=s>&lt;&lt;EOF
+</span><span class=s>{
+</span><span class=s>&#34;exec-opts&#34;: [&#34;native.cgroupdriver=systemd&#34;]
+</span><span class=s>}
+</span><span class=s>EOF</span>
+systemctl daemon-reload
+systemctl <span class=nb>enable</span> docker
+systemctl restart docker
+</code></pre></td></tr></table></div></div><h3 id=关闭-swapoff>关闭 swapoff</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>swapoff -a
+sed -i <span class=s1>&#39;/ swap / s/^\(.*\)$/#\1/g&#39;</span> /etc/fstab
+</code></pre></td></tr></table></div></div><h3 id=设置宿主机-dns>设置宿主机 dns</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>vim /etc/hosts
+</code></pre></td></tr></table></div></div><h3 id=集群初始化>集群初始化</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span><span class=lnt>70
+</span><span class=lnt>71
+</span><span class=lnt>72
+</span><span class=lnt>73
+</span><span class=lnt>74
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash><span class=o>[</span>root@m-100 ~<span class=o>]</span><span class=c1># kubeadm init --pod-network-cidr=192.168.0.0/16</span>
+W0217 10:01:19.304156   <span class=m>10476</span> version.go:101<span class=o>]</span> could not fetch a Kubernetes version from the internet: unable to get URL <span class=s2>&#34;https://dl.k8s.io/release/stable-1.txt&#34;</span>: Get https://dl.k8s.io/release/stable-1.txt: net/http: request canceled <span class=k>while</span> waiting <span class=k>for</span> connection <span class=o>(</span>Client.Timeout exceeded <span class=k>while</span> awaiting headers<span class=o>)</span>
+W0217 10:01:19.304321   <span class=m>10476</span> version.go:102<span class=o>]</span> falling back to the <span class=nb>local</span> client version: v1.17.3
+W0217 10:01:19.304755   <span class=m>10476</span> validation.go:28<span class=o>]</span> Cannot validate kube-proxy config - no validator is available
+W0217 10:01:19.304772   <span class=m>10476</span> validation.go:28<span class=o>]</span> Cannot validate kubelet config - no validator is available
+<span class=o>[</span>init<span class=o>]</span> Using Kubernetes version: v1.17.3
+<span class=o>[</span>preflight<span class=o>]</span> Running pre-flight checks
+    <span class=o>[</span>WARNING Service-Kubelet<span class=o>]</span>: kubelet service is not enabled, please run <span class=s1>&#39;systemctl enable kubelet.service&#39;</span>
+<span class=o>[</span>preflight<span class=o>]</span> Pulling images required <span class=k>for</span> setting up a Kubernetes cluster
+<span class=o>[</span>preflight<span class=o>]</span> This might take a minute or two, depending on the speed of your internet connection
+<span class=o>[</span>preflight<span class=o>]</span> You can also perform this action in beforehand using <span class=s1>&#39;kubeadm config images pull&#39;</span>
+<span class=o>[</span>kubelet-start<span class=o>]</span> Writing kubelet environment file with flags to file <span class=s2>&#34;/var/lib/kubelet/kubeadm-flags.env&#34;</span>
+<span class=o>[</span>kubelet-start<span class=o>]</span> Writing kubelet configuration to file <span class=s2>&#34;/var/lib/kubelet/config.yaml&#34;</span>
+<span class=o>[</span>kubelet-start<span class=o>]</span> Starting the kubelet
+<span class=o>[</span>certs<span class=o>]</span> Using certificateDir folder <span class=s2>&#34;/etc/kubernetes/pki&#34;</span>
+<span class=o>[</span>certs<span class=o>]</span> Generating <span class=s2>&#34;ca&#34;</span> certificate and key
+<span class=o>[</span>certs<span class=o>]</span> Generating <span class=s2>&#34;apiserver&#34;</span> certificate and key
+<span class=o>[</span>certs<span class=o>]</span> apiserver serving cert is signed <span class=k>for</span> DNS names <span class=o>[</span>m-100 kubernetes kubernetes.default kubernetes.default.svc kubernetes.default.svc.cluster.local<span class=o>]</span> and IPs <span class=o>[</span>10.96.0.1 10.12.1.100<span class=o>]</span>
+<span class=o>[</span>certs<span class=o>]</span> Generating <span class=s2>&#34;apiserver-kubelet-client&#34;</span> certificate and key
+<span class=o>[</span>certs<span class=o>]</span> Generating <span class=s2>&#34;front-proxy-ca&#34;</span> certificate and key
+<span class=o>[</span>certs<span class=o>]</span> Generating <span class=s2>&#34;front-proxy-client&#34;</span> certificate and key
+<span class=o>[</span>certs<span class=o>]</span> Generating <span class=s2>&#34;etcd/ca&#34;</span> certificate and key
+<span class=o>[</span>certs<span class=o>]</span> Generating <span class=s2>&#34;etcd/server&#34;</span> certificate and key
+<span class=o>[</span>certs<span class=o>]</span> etcd/server serving cert is signed <span class=k>for</span> DNS names <span class=o>[</span>m-100 localhost<span class=o>]</span> and IPs <span class=o>[</span>10.12.1.100 127.0.0.1 ::1<span class=o>]</span>
+<span class=o>[</span>certs<span class=o>]</span> Generating <span class=s2>&#34;etcd/peer&#34;</span> certificate and key
+<span class=o>[</span>certs<span class=o>]</span> etcd/peer serving cert is signed <span class=k>for</span> DNS names <span class=o>[</span>m-100 localhost<span class=o>]</span> and IPs <span class=o>[</span>10.12.1.100 127.0.0.1 ::1<span class=o>]</span>
+<span class=o>[</span>certs<span class=o>]</span> Generating <span class=s2>&#34;etcd/healthcheck-client&#34;</span> certificate and key
+<span class=o>[</span>certs<span class=o>]</span> Generating <span class=s2>&#34;apiserver-etcd-client&#34;</span> certificate and key
+<span class=o>[</span>certs<span class=o>]</span> Generating <span class=s2>&#34;sa&#34;</span> key and public key
+<span class=o>[</span>kubeconfig<span class=o>]</span> Using kubeconfig folder <span class=s2>&#34;/etc/kubernetes&#34;</span>
+<span class=o>[</span>kubeconfig<span class=o>]</span> Writing <span class=s2>&#34;admin.conf&#34;</span> kubeconfig file
+<span class=o>[</span>kubeconfig<span class=o>]</span> Writing <span class=s2>&#34;kubelet.conf&#34;</span> kubeconfig file
+<span class=o>[</span>kubeconfig<span class=o>]</span> Writing <span class=s2>&#34;controller-manager.conf&#34;</span> kubeconfig file
+<span class=o>[</span>kubeconfig<span class=o>]</span> Writing <span class=s2>&#34;scheduler.conf&#34;</span> kubeconfig file
+<span class=o>[</span>control-plane<span class=o>]</span> Using manifest folder <span class=s2>&#34;/etc/kubernetes/manifests&#34;</span>
+<span class=o>[</span>control-plane<span class=o>]</span> Creating static Pod manifest <span class=k>for</span> <span class=s2>&#34;kube-apiserver&#34;</span>
+<span class=o>[</span>control-plane<span class=o>]</span> Creating static Pod manifest <span class=k>for</span> <span class=s2>&#34;kube-controller-manager&#34;</span>
+W0217 10:01:24.604930   <span class=m>10476</span> manifests.go:214<span class=o>]</span> the default kube-apiserver authorization-mode is <span class=s2>&#34;Node,RBAC&#34;</span><span class=p>;</span> using <span class=s2>&#34;Node,RBAC&#34;</span>
+<span class=o>[</span>control-plane<span class=o>]</span> Creating static Pod manifest <span class=k>for</span> <span class=s2>&#34;kube-scheduler&#34;</span>
+W0217 10:01:24.606403   <span class=m>10476</span> manifests.go:214<span class=o>]</span> the default kube-apiserver authorization-mode is <span class=s2>&#34;Node,RBAC&#34;</span><span class=p>;</span> using <span class=s2>&#34;Node,RBAC&#34;</span>
+<span class=o>[</span>etcd<span class=o>]</span> Creating static Pod manifest <span class=k>for</span> <span class=nb>local</span> etcd in <span class=s2>&#34;/etc/kubernetes/manifests&#34;</span>
+<span class=o>[</span>wait-control-plane<span class=o>]</span> Waiting <span class=k>for</span> the kubelet to boot up the control plane as static Pods from directory <span class=s2>&#34;/etc/kubernetes/manifests&#34;</span>. This can take up to 4m0s
+<span class=o>[</span>apiclient<span class=o>]</span> All control plane components are healthy after 35.003335 seconds
+<span class=o>[</span>upload-config<span class=o>]</span> Storing the configuration used in ConfigMap <span class=s2>&#34;kubeadm-config&#34;</span> in the <span class=s2>&#34;kube-system&#34;</span> Namespace
+<span class=o>[</span>kubelet<span class=o>]</span> Creating a ConfigMap <span class=s2>&#34;kubelet-config-1.17&#34;</span> in namespace kube-system with the configuration <span class=k>for</span> the kubelets in the cluster
+<span class=o>[</span>upload-certs<span class=o>]</span> Skipping phase. Please see --upload-certs
+<span class=o>[</span>mark-control-plane<span class=o>]</span> Marking the node m-100 as control-plane by adding the label <span class=s2>&#34;node-role.kubernetes.io/master=&#39;&#39;&#34;</span>
+<span class=o>[</span>mark-control-plane<span class=o>]</span> Marking the node m-100 as control-plane by adding the taints <span class=o>[</span>node-role.kubernetes.io/master:NoSchedule<span class=o>]</span>
+<span class=o>[</span>bootstrap-token<span class=o>]</span> Using token: 0aizeu.ji5y0dooy8g658n1
+<span class=o>[</span>bootstrap-token<span class=o>]</span> Configuring bootstrap tokens, cluster-info ConfigMap, RBAC Roles
+<span class=o>[</span>bootstrap-token<span class=o>]</span> configured RBAC rules to allow Node Bootstrap tokens to post CSRs in order <span class=k>for</span> nodes to get long term certificate credentials
+<span class=o>[</span>bootstrap-token<span class=o>]</span> configured RBAC rules to allow the csrapprover controller automatically approve CSRs from a Node Bootstrap Token
+<span class=o>[</span>bootstrap-token<span class=o>]</span> configured RBAC rules to allow certificate rotation <span class=k>for</span> all node client certificates in the cluster
+<span class=o>[</span>bootstrap-token<span class=o>]</span> Creating the <span class=s2>&#34;cluster-info&#34;</span> ConfigMap in the <span class=s2>&#34;kube-public&#34;</span> namespace
+<span class=o>[</span>kubelet-finalize<span class=o>]</span> Updating <span class=s2>&#34;/etc/kubernetes/kubelet.conf&#34;</span> to point to a rotatable kubelet client certificate and key
+<span class=o>[</span>addons<span class=o>]</span> Applied essential addon: CoreDNS
+<span class=o>[</span>addons<span class=o>]</span> Applied essential addon: kube-proxy
+ 
+Your Kubernetes control-plane has initialized successfully!
+ 
+To start using your cluster, you need to run the following as a regular user:
+ 
+  mkdir -p <span class=nv>$HOME</span>/.kube
+  sudo cp -i /etc/kubernetes/admin.conf <span class=nv>$HOME</span>/.kube/config
+  sudo chown <span class=k>$(</span>id -u<span class=k>)</span>:<span class=k>$(</span>id -g<span class=k>)</span> <span class=nv>$HOME</span>/.kube/config
+ 
+You should now deploy a pod network to the cluster.
+Run <span class=s2>&#34;kubectl apply -f [podnetwork].yaml&#34;</span> with one of the options listed at:
+  https://kubernetes.io/docs/concepts/cluster-administration/addons/
+ 
+Then you can join any number of worker nodes by running the following on each as root:
+ 
+kubeadm join 10.12.1.100:6443 --token 0aizeu.ji5y0dooy8g658n1 <span class=se>\
+</span><span class=se></span>    --discovery-token-ca-cert-hash sha256:1bc30ca4b0c09582bf0537ca2f516ae2c510becd5bdefe4ec866f9201f3519a5
+</code></pre></td></tr></table></div></div><h3 id=配置-kubectl>配置 kubectl</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>mkdir -p <span class=nv>$HOME</span>/.kube
+sudo cp -i /etc/kubernetes/admin.conf <span class=nv>$HOME</span>/.kube/config
+sudo chown <span class=k>$(</span>id -u<span class=k>)</span>:<span class=k>$(</span>id -g<span class=k>)</span> <span class=nv>$HOME</span>/.kube/config
+</code></pre></td></tr></table></div></div><h3 id=验证-kubernetes-集群>验证 kubernetes 集群</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>kubectl get po -A
+</code></pre></td></tr></table></div></div><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184327832.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184327832.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184327832.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184327832.png 2x" data-sizes=auto alt=image-20200511184327832 title=image-20200511184327832></p><p>发现 coredns pending，因为还未安装网络插件。</p><p>启用 calico 网络插件</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>kubectl apply -f https://docs.projectcalico.org/v3.8/manifests/calico.yaml
+</code></pre></td></tr></table></div></div><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184405481.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184405481.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184405481.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184405481.png 2x" data-sizes=auto alt=image-20200511184405481 title=image-20200511184405481></p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184430873.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184430873.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184430873.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184430873.png 2x" data-sizes=auto alt=image-20200511184430873 title=image-20200511184430873></p><p>此时，只有一个主节点，calico 网络运行不起来，执行如下命令</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>kubectl taint nodes --all node-role.kubernetes.io/master-
+</code></pre></td></tr></table></div></div><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184458185.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184458185.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184458185.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184458185.png 2x" data-sizes=auto alt=image-20200511184458185 title=image-20200511184458185></p><h1 id=3-工作节点配置>3. 工作节点配置</h1><h3 id=添加工作节点>添加工作节点</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>kubeadm join 10.12.1.100:6443 --token 0aizeu.ji5y0dooy8g658n1 <span class=se>\
+</span><span class=se></span>    --discovery-token-ca-cert-hash sha256:1bc30ca4b0c09582bf0537ca2f516ae2c510becd5bdefe4ec866f9201f3519a5
+</code></pre></td></tr></table></div></div><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511185404042.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511185404042.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511185404042.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511185404042.png 2x" data-sizes=auto alt=image-20200511185404042 title=image-20200511185404042></p><h3 id=验证工作节点>验证工作节点</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>kubectl get nodes
+ 
+kubectl get po -A -o wide
+</code></pre></td></tr></table></div></div><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184534034.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184534034.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184534034.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184534034.png 2x" data-sizes=auto alt=image-20200511184534034 title=image-20200511184534034></p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184553066.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184553066.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184553066.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184553066.png 2x" data-sizes=auto alt=image-20200511184553066 title=image-20200511184553066></p><h3 id=添加第二个工作节点>添加第二个工作节点</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>kubeadm join 10.12.1.100:6443 --token 0aizeu.ji5y0dooy8g658n1 <span class=se>\
+</span><span class=se></span>    --discovery-token-ca-cert-hash sha256:1bc30ca4b0c09582bf0537ca2f516ae2c510becd5bdefe4ec866f9201f3519a5
+</code></pre></td></tr></table></div></div><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184629027.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184629027.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184629027.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184629027.png 2x" data-sizes=auto alt=image-20200511184629027 title=image-20200511184629027></p><h3 id=验证工作节点-1>验证工作节点</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>kubectl get nodes
+ 
+kubectl get po -A -o wide
+</code></pre></td></tr></table></div></div><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184700542.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184700542.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184700542.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184700542.png 2x" data-sizes=auto alt=image-20200511184700542 title=image-20200511184700542></p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184716638.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184716638.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184716638.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184716638.png 2x" data-sizes=auto alt=image-20200511184716638 title=image-20200511184716638></p></div><div class=post-footer id=post-footer><div class=post-info><div class=post-info-line><div class=post-info-mod><span>更新于 2020-05-11</span></div><div class=post-info-license></div></div><div class=post-info-line><div class=post-info-md></div><div class=post-info-share><span></span></div></div></div><div class=post-info-more><section class=post-tags><i class="fas fa-tags fa-fw"></i>&nbsp;<a href=/tags/istio/>Istio</a>,&nbsp;<a href=/tags/%E5%AE%9E%E9%AA%8C/>实验</a></section><section><span><a href=javascript:void(0); onclick=window.history.back();>返回</a></span>&nbsp;|&nbsp;<span><a href=/>主页</a></span></section></div><div class=post-nav><a href=/%E7%BD%91%E6%A0%BC%E5%8F%AF%E8%A7%86%E5%8C%96/ class=prev rel=prev title=网格可视化><i class="fas fa-angle-left fa-fw"></i>网格可视化</a>
+<a href=/helm3%E9%83%A8%E7%BD%B2istio-1.4/ class=next rel=next title="Helm3部署Istio 1.4">Helm3部署Istio 1.4<i class="fas fa-angle-right fa-fw"></i></a></div></div><div id=comments><div id=gitalk class=comment></div><noscript>Please enable JavaScript to view the comments powered by <a href=https://github.com/gitalk/gitalk></a>Gitalk</a>.</noscript></div></article></div></main><footer class=footer><div class=footer-container><div class=footer-line>由 <a href=https://gohugo.io/ target=_blank rel="noopener noreffer" title="Hugo 0.71.1">Hugo</a> 强力驱动 | 主题 - <a href=https://github.com/dillonzq/LoveIt target=_blank rel="noopener noreffer" title="LoveIt 0.2.9"><i class="far fa-kiss-wink-heart fa-fw"></i>LoveIt</a></div><div class=footer-line><i class="far fa-copyright fa-fw"></i><span itemprop=copyrightYear>2019 - 2020</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=garroshh.me target=_blank>garroshh</a></span>&nbsp;|&nbsp;<span class=license><a rel="license external nofollow noopener noreffer" href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank>CC BY-NC 4.0</a></span></div></div></footer></div><div id=fixed-buttons><a href=# id=back-to-top class=fixed-button title=回到顶部><i class="fas fa-arrow-up fa-fw"></i></a><a href=# id=view-comments class=fixed-button title=查看评论><i class="fas fa-comment fa-fw"></i></a></div><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/gitalk@1.6.2/dist/gitalk.min.css><script type=text/javascript src=https://cdn.jsdelivr.net/npm/gitalk@1.6.2/dist/gitalk.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/smooth-scroll@16.1.3/dist/smooth-scroll.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/autocomplete.js@0.37.1/dist/autocomplete.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/algoliasearch@4.2.0/dist/algoliasearch-lite.umd.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/lazysizes@5.2.0/lazysizes.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/typeit@7.0.4/dist/typeit.min.js></script><script type=text/javascript>window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":10},"comment":{"gitalk":{"admin":["garroshh"],"clientID":"765aeb40ecd9058c4ab8","clientSecret":"824af1ecb35c665e4d7fb379211bb748841e96a1","id":"2020-05-11T18:40:05+08:00","owner":"garroshh","repo":"garroshh.github.io","title":"Kubeadm搭建Kubernetes集群"}},"data":{"id-1":"Garroshh's Blog","id-2":"Garroshh's Blog"},"search":{"algoliaAppID":"PASDMWALPK","algoliaIndex":"index.zh-cn","algoliaSearchKey":"b42948e51daaa93df92381c8e2ac0f93","highlightTag":"em","maxResultLength":10,"noResultsFound":"没有找到结果","snippetLength":50,"type":"algolia"},"typeit":{"cursorChar":"|","cursorSpeed":1000,"data":{"id-1":["id-1"],"id-2":["id-2"]},"duration":-1,"speed":100}};</script><script type=text/javascript src=/js/theme.min.js></script></body></html>

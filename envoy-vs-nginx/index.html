@@ -1,0 +1,195 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noodp"><meta http-equiv=x-ua-compatible content="IE=edge, chrome=1"><title>Envoy VS Nginx - LoveIt</title><meta name=Description content="关于 LoveIt 主题"><meta property="og:title" content="Envoy VS Nginx"><meta property="og:description" content="目标 对比Envoy 和 Nginx 配置 Nginx配置 Nginx 配置三要素： 全局配置 Nginx 服务器，日志记录结构，Gzip 功能等 配置 Nginx 在 10000 端口接收对 one.example.com 主机的请求 配置如何"><meta property="og:type" content="article"><meta property="og:url" content="https://garroshh.me/envoy-vs-nginx/"><meta property="og:image" content="https://garroshh.me/logo.png"><meta property="article:published_time" content="2020-05-06T10:38:06+08:00"><meta property="article:modified_time" content="2020-05-28T16:36:59+08:00"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://garroshh.me/logo.png"><meta name=twitter:title content="Envoy VS Nginx"><meta name=twitter:description content="目标 对比Envoy 和 Nginx 配置 Nginx配置 Nginx 配置三要素： 全局配置 Nginx 服务器，日志记录结构，Gzip 功能等 配置 Nginx 在 10000 端口接收对 one.example.com 主机的请求 配置如何"><meta name=application-name content="LoveIt"><meta name=apple-mobile-web-app-title content="LoveIt"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://garroshh.me/envoy-vs-nginx/><link rel=prev href=https://garroshh.me/hello-envoy/><link rel=next href=https://garroshh.me/envoy-%E5%89%8D%E7%AB%AF%E4%BB%A3%E7%90%86/><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css><link rel=stylesheet href=/css/style.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/animate.css@3.7.2/animate.min.css><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"Envoy VS Nginx","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/garroshh.me\/envoy-vs-nginx\/"},"image":{"@type":"ImageObject","url":"https:\/\/garroshh.me\/cover.png","width":800,"height":600},"genre":"posts","keywords":"Envoy, 实验","wordcount":1092,"url":"https:\/\/garroshh.me\/envoy-vs-nginx\/","datePublished":"2020-05-06T10:38:06+08:00","dateModified":"2020-05-28T16:36:59+08:00","license":"This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher":{"@type":"Organization","name":"xxxx","logo":{"@type":"ImageObject","url":"https:\/\/garroshh.me\/logo.png","width":127,"height":40}},"author":{"@type":"Person","name":"garroshh"},"description":""}</script></head><body header-desktop=fixed header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem('theme')?localStorage.getItem('theme')==='dark':('auto'==='auto'?window.matchMedia('(prefers-color-scheme: dark)').matches:'auto'==='dark'))&&document.body.setAttribute('theme','dark');</script><div id=mask></div><div class=wrapper><header class=desktop id=header-desktop><div class=header-wrapper><div class=header-title><a href=/ title=LoveIt><span class=header-title-pre><i class="far fa-kiss-wink-heart fa-fw"></i></span><span id=id-1 class=typeit></span></a></div><div class=menu><div class=menu-inner><a class=menu-item href=/posts/>所有文章 </a><a class=menu-item href=/tags/>标签 </a><a class=menu-item href=/categories/>分类 </a><a class=menu-item href=/categories/documentation/>文档 </a><a class=menu-item href=/about/>关于 </a><a class=menu-item href=https://github.com/dillonzq/LoveIt title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i></a><span class="menu-item delimiter"></span><a href=javascript:void(0); class="menu-item language" title=选择语言>简体中文<i class="fas fa-chevron-right fa-fw"></i>
+<select class=language-select id=language-select-desktop onchange="location=this.value;"><option value=/envoy-vs-nginx/ selected>简体中文</option></select>
+</a><span class="menu-item search" id=search-desktop><input type=text placeholder=搜索文章标题或内容... id=search-input-desktop>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-desktop title=搜索><i class="fas fa-search fa-fw"></i></a><a href=javascript:void(0); class="search-button search-clear" id=search-clear-desktop title=清空><i class="fas fa-times-circle fa-fw"></i></a><span class="search-button search-loading" id=search-loading-desktop><i class="fas fa-spinner fa-fw fa-spin"></i></span></span><a href=javascript:void(0); class="menu-item theme-switch" title=切换主题><i class="fas fa-adjust fa-fw"></i></a></div></div></div></header><header class=mobile id=header-mobile><div class=header-container><div class=header-wrapper><div class=header-title><a href=/ title=LoveIt><span class=header-title-pre><i class="far fa-kiss-wink-heart fa-fw"></i></span><span id=id-2 class=typeit></span></a></div><div class=menu-toggle id=menu-toggle-mobile><span></span><span></span><span></span></div></div><div class=menu id=menu-mobile><div class=search-wrapper><div class="search mobile" id=search-mobile><input type=text placeholder=搜索文章标题或内容... id=search-input-mobile>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-mobile title=搜索><i class="fas fa-search fa-fw"></i></a><a href=javascript:void(0); class="search-button search-clear" id=search-clear-mobile title=清空><i class="fas fa-times-circle fa-fw"></i></a><span class="search-button search-loading" id=search-loading-mobile><i class="fas fa-spinner fa-fw fa-spin"></i></span></div><a href=javascript:void(0); class=search-cancel id=search-cancel-mobile>取消</a></div><a class=menu-item href=/posts/>所有文章</a><a class=menu-item href=/tags/>标签</a><a class=menu-item href=/categories/>分类</a><a class=menu-item href=/categories/documentation/>文档</a><a class=menu-item href=/about/>关于</a><a class=menu-item href=https://github.com/dillonzq/LoveIt title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i></a><a href=javascript:void(0); class="menu-item theme-switch" title=切换主题>
+<i class="fas fa-adjust fa-fw"></i></a><a href=javascript:void(0); class=menu-item title=选择语言>简体中文<i class="fas fa-chevron-right fa-fw"></i>
+<select class=language-select onchange="location=this.value;"><option value=/envoy-vs-nginx/ selected>简体中文</option></select></a></div></div></header><div class="search-dropdown desktop"><div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile"><div id=search-dropdown-mobile></div></div><main class=main><div class=container><div class=toc id=toc-auto><h2 class=toc-title>目录</h2><div class=toc-content id=toc-content-auto></div></div><article class="page single"><h1 class="single-title animated flipInX">Envoy VS Nginx</h1><div class=post-meta><div class=post-meta-line><span class=post-author><a href=garroshh.me title=Author rel=author class=author><i class="fas fa-user-circle fa-fw"></i>garroshh</a></span>&nbsp;<span class=post-category>收录于 <a href=/categories/envoy/><i class="far fa-folder fa-fw"></i>Envoy</a></span></div><div class=post-meta-line><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime=2020-05-06>2020-05-06</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 1092 字&nbsp;
+<i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 3 分钟&nbsp;</div></div><div class="details toc" id=toc-static kept><div class="details-summary toc-title"><span>目录</span>
+<span><i class="details-icon fas fa-angle-right"></i></span></div><div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents></nav></div></div><div class=content id=content><h1 id=目标>目标</h1><p>对比Envoy 和 Nginx 配置</p><h1 id=nginx配置>Nginx配置</h1><p>Nginx 配置三要素：</p><ul><li>全局配置 Nginx 服务器，日志记录结构，Gzip 功能等</li><li>配置 Nginx 在 10000 端口接收对 one.example.com 主机的请求</li><li>配置如何处理到达不同 URL 的流量的目标地址</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-nginx data-lang=nginx><span class=k>user</span>  <span class=s>www</span> <span class=s>www</span><span class=p>;</span>
+<span class=k>pid</span> <span class=s>/var/run/nginx.pid</span><span class=p>;</span>
+<span class=k>worker_processes</span>  <span class=mi>2</span><span class=p>;</span>
+ 
+<span class=k>events</span> <span class=p>{</span>
+  <span class=kn>worker_connections</span>   <span class=mi>2000</span><span class=p>;</span>
+<span class=p>}</span>
+ 
+<span class=k>http</span> <span class=p>{</span>
+  <span class=kn>gzip</span> <span class=no>on</span><span class=p>;</span>
+  <span class=kn>gzip_min_length</span>  <span class=mi>1100</span><span class=p>;</span>
+  <span class=kn>gzip_buffers</span>     <span class=mi>4</span> <span class=mi>8k</span><span class=p>;</span>
+  <span class=kn>gzip_types</span>       <span class=s>text/plain</span><span class=p>;</span>
+ 
+  <span class=kn>log_format</span> <span class=s>main</span>      <span class=s>&#39;</span><span class=nv>$remote_addr</span> <span class=s>-</span> <span class=nv>$remote_user</span> <span class=s>[</span><span class=nv>$time_local]</span>  <span class=s>&#39;</span>
+    <span class=s>&#39;&#34;</span><span class=nv>$request&#34;</span> <span class=nv>$status</span> <span class=nv>$bytes_sent</span> <span class=s>&#39;</span>
+    <span class=s>&#39;&#34;</span><span class=nv>$http_referer&#34;</span> <span class=s>&#34;</span><span class=nv>$http_user_agent&#34;</span> <span class=s>&#39;</span>
+    <span class=s>&#39;&#34;</span><span class=nv>$gzip_ratio&#34;&#39;</span><span class=p>;</span>
+ 
+  <span class=kn>log_format</span> <span class=s>download</span>  <span class=s>&#39;</span><span class=nv>$remote_addr</span> <span class=s>-</span> <span class=nv>$remote_user</span> <span class=s>[</span><span class=nv>$time_local]</span>  <span class=s>&#39;</span>
+    <span class=s>&#39;&#34;</span><span class=nv>$request&#34;</span> <span class=nv>$status</span> <span class=nv>$bytes_sent</span> <span class=s>&#39;</span>
+    <span class=s>&#39;&#34;</span><span class=nv>$http_referer&#34;</span> <span class=s>&#34;</span><span class=nv>$http_user_agent&#34;</span> <span class=s>&#39;</span>
+    <span class=s>&#39;&#34;</span><span class=nv>$http_range&#34;</span> <span class=s>&#34;</span><span class=nv>$sent_http_content_range&#34;&#39;</span><span class=p>;</span>
+ 
+ 
+  <span class=kn>upstream</span> <span class=s>targetCluster</span> <span class=p>{</span>
+    <span class=kn>172.18.0.3:80</span><span class=p>;</span>
+    <span class=kn>172.18.0.4:80</span><span class=p>;</span>
+  <span class=p>}</span>
+ 
+  <span class=kn>server</span> <span class=p>{</span>
+    <span class=kn>listen</span>        <span class=mi>10000</span><span class=p>;</span>
+    <span class=kn>server_name</span>   <span class=no>on</span><span class=s>e.example.com</span>  <span class=s>www.one.example.com</span><span class=p>;</span>
+ 
+    <span class=kn>access_log</span>   <span class=s>/var/log/nginx.access_log</span>  <span class=s>main</span><span class=p>;</span>
+    <span class=kn>error_log</span>  <span class=s>/var/log/nginx.error_log</span>  <span class=s>info</span><span class=p>;</span>
+ 
+    <span class=kn>location</span> <span class=s>/</span> <span class=p>{</span>
+      <span class=kn>proxy_pass</span>         <span class=s>http://targetCluster/</span><span class=p>;</span>
+      <span class=kn>proxy_redirect</span>     <span class=no>off</span><span class=p>;</span>
+ 
+      <span class=kn>proxy_set_header</span>   <span class=s>Host</span>             <span class=nv>$host</span><span class=p>;</span>
+      <span class=kn>proxy_set_header</span>   <span class=s>X-Real-IP</span>        <span class=nv>$remote_addr</span><span class=p>;</span>
+    <span class=p>}</span>
+  <span class=p>}</span>
+<span class=p>}</span>
+</code></pre></td></tr></table></div></div><h1 id=envoy-配置>Envoy 配置</h1><p>Envoy 配置四要素：</p><ul><li>Listeners：定义了 Envoy 如何接收传入的请求。当前，Envoy 仅支持基于 TCP 的监听器，建立连接后，Envoy 会将流量传递到一组过滤器进行处理</li><li>Filters：处理入站和出站数据。比如Gzip过滤器，该过滤器会将数据发送到客户端前压缩数据</li><li>Routers: 将流量转发到所需的目的地（定义为集群）</li><li>Clusters: 定义流量的目的端点和配置设置，如负载均衡策略</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-yaml data-lang=yaml><span class=k>static_resources</span><span class=p>:</span><span class=w> </span><span class=c>#静态API配置</span><span class=w>
+</span><span class=w>  </span><span class=k>listeners</span><span class=p>:</span><span class=w>  </span><span class=c>#监听器配置</span><span class=w>
+</span><span class=w>  </span>- <span class=k>name</span><span class=p>:</span><span class=w> </span>listener_0<span class=w>
+</span><span class=w>    </span><span class=k>address</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span><span class=k>socket_address</span><span class=p>:</span><span class=w>
+</span><span class=w>        </span><span class=k>protocol</span><span class=p>:</span><span class=w> </span>TCP<span class=w>
+</span><span class=w>        </span><span class=k>address</span><span class=p>:</span><span class=w> </span><span class=m>0.0.0.0</span><span class=w>
+</span><span class=w>        </span><span class=k>port_value</span><span class=p>:</span><span class=w> </span><span class=m>10000</span><span class=w>
+</span><span class=w>    </span><span class=k>filter_chains</span><span class=p>:</span><span class=w>  </span><span class=c>#过滤器链配置</span><span class=w>
+</span><span class=w>    </span>- <span class=k>filters</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span>- <span class=k>name</span><span class=p>:</span><span class=w> </span>envoy.http_connection_manager<span class=w>
+</span><span class=w>        </span><span class=k>typed_config</span><span class=p>:</span><span class=w>
+</span><span class=w>          </span><span class=k>&#34;@type&#34;: </span>type.googleapis.com/envoy.config.filter.network.http_connection_manager.v2.HttpConnectionManager<span class=w>
+</span><span class=w>          </span><span class=k>stat_prefix</span><span class=p>:</span><span class=w> </span>ingress_http<span class=w>  </span><span class=c>##连接管理器发出统计信息时使用的可读性前缀</span><span class=w>
+</span><span class=w>          </span><span class=k>access_log</span><span class=p>:</span><span class=w>
+</span><span class=w>          </span>- <span class=k>name</span><span class=p>:</span><span class=w> </span>envoy.file_access_log<span class=w>
+</span><span class=w>            </span><span class=k>config</span><span class=p>:</span><span class=w>
+</span><span class=w>              </span><span class=k>path</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;/dev/stdout&#34;</span><span class=w>
+</span><span class=w>              </span><span class=k>format</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;[%START_TIME%] &#34;%REQ(:METHOD)% %REQ(X-ENVOY-ORIGINAL-PATH?:PATH)% %PROTOCOL%&#34; %RESPONSE_CODE% %RESP(X-ENVOY-UPSTREAM-SERVICE-TIME)% &#34;%REQ(X-REQUEST-ID)%&#34; &#34;%REQ(:AUTHORITY)%&#34; &#34;%UPSTREAM_HOST%&#34;\n&#39;</span><span class=w>
+</span><span class=w>              </span><span class=c>#json_format: {&#34;protocol&#34;: &#34;%PROTOCOL%&#34;, &#34;duration&#34;: &#34;%DURATION%&#34;, &#34;request_method&#34;: &#34;%REQ(:METHOD)%&#34;}</span><span class=w>
+</span><span class=w>          </span><span class=k>route_config</span><span class=p>:</span><span class=w>
+</span><span class=w>            </span><span class=k>name</span><span class=p>:</span><span class=w> </span>local_route<span class=w>
+</span><span class=w>            </span><span class=k>virtual_hosts</span><span class=p>:</span><span class=w>
+</span><span class=w>            </span>- <span class=k>name</span><span class=p>:</span><span class=w> </span>local_service<span class=w>
+</span><span class=w>              </span><span class=c>#domains: [&#34;*&#34;]  ##虚拟主机配置</span><span class=w>
+</span><span class=w>              </span><span class=k>domains</span><span class=p>:</span><span class=w>
+</span><span class=w>                </span>- <span class=s2>&#34;one.example.com&#34;</span><span class=w>
+</span><span class=w>                </span>- <span class=s2>&#34;www.one.example.com&#34;</span><span class=w>
+</span><span class=w>              </span><span class=k>routes</span><span class=p>:</span><span class=w>  </span><span class=c>##如果虚拟主机匹配，则检查路由</span><span class=w>
+</span><span class=w>              </span>- <span class=k>match</span><span class=p>:</span><span class=w>
+</span><span class=w>                  </span><span class=k>prefix</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;/&#34;</span><span class=w>
+</span><span class=w>                </span><span class=k>route</span><span class=p>:</span><span class=w>
+</span><span class=w>                  </span><span class=k>cluster</span><span class=p>:</span><span class=w> </span>targetCluster<span class=w>  </span><span class=c>##处理匹配的路由的集群名称</span><span class=w>
+</span><span class=w>          </span><span class=k>http_filters</span><span class=p>:</span><span class=w>
+</span><span class=w>          </span>- <span class=k>name</span><span class=p>:</span><span class=w> </span>envoy.router<span class=w>  </span><span class=c>##该过滤器允许Envoy在处理请求时适应和修改请求</span><span class=w>
+</span><span class=w>  </span><span class=k>clusters</span><span class=p>:</span><span class=w>  </span><span class=c>##当请求与过滤器匹配时，该请求将传递到集群。</span><span class=w>
+</span><span class=w>  </span>- <span class=k>name</span><span class=p>:</span><span class=w> </span>targetCluster<span class=w>
+</span><span class=w>    </span><span class=k>connect_timeout</span><span class=p>:</span><span class=w> </span><span class=m>0.</span>25s<span class=w>
+</span><span class=w>    </span><span class=k>type</span><span class=p>:</span><span class=w> </span>STRICT_DNS<span class=w>
+</span><span class=w>    </span><span class=c># Comment out the following line to test on v6 networks</span><span class=w>
+</span><span class=w>    </span><span class=k>dns_lookup_family</span><span class=p>:</span><span class=w> </span>V4_ONLY<span class=w>
+</span><span class=w>    </span><span class=k>lb_policy</span><span class=p>:</span><span class=w> </span>ROUND_ROBIN<span class=w>
+</span><span class=w>    </span><span class=k>hosts</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=w>
+</span><span class=w>      </span>{<span class=w> </span><span class=k>socket_address</span><span class=p>:</span><span class=w> </span>{<span class=w> </span><span class=k>address: 172.17.0.4, port_value</span><span class=p>:</span><span class=w> </span><span class=m>80</span><span class=w> </span>}}<span class=p>,</span><span class=w>
+</span><span class=w>      </span>{<span class=w> </span><span class=k>socket_address</span><span class=p>:</span><span class=w> </span>{<span class=w> </span><span class=k>address: 172.17.0.5, port_value</span><span class=p>:</span><span class=w> </span><span class=m>80</span><span class=w> </span>}}<span class=w>
+</span><span class=w>    </span><span class=p>]</span><span class=w>
+</span></code></pre></td></tr></table></div></div><h1 id=测试通过-envoy-流量转发轮询的负载均衡到后端两个服务>测试：通过 Envoy 流量转发，轮询的负载均衡到后端两个服务</h1><p>按照如上Envoy配置，启动 Envoy 容器。后端两个服务未启动时，返回503，属于正常现象。</p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image2019-12-27_15-3-22.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image2019-12-27_15-3-22.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image2019-12-27_15-3-22.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image2019-12-27_15-3-22.png 2x" data-sizes=auto alt=image2019-12-27_15-3-22 title=image2019-12-27_15-3-22></p><p>启动后端两个服务</p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image2019-12-27_15-7-6.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image2019-12-27_15-7-6.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image2019-12-27_15-7-6.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image2019-12-27_15-7-6.png 2x" data-sizes=auto alt=image2019-12-27_15-7-6 title=image2019-12-27_15-7-6></p><p>通过 Envoy 流量转发，轮询的负载均衡到后端两个服务</p><p><img class=lazyload src=/svg/loading/small.min.svg data-src=https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image2019-12-27_15-9-9.png data-srcset="https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image2019-12-27_15-9-9.png, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image2019-12-27_15-9-9.png 1.5x, https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image2019-12-27_15-9-9.png 2x" data-sizes=auto alt=image2019-12-27_15-9-9 title=image2019-12-27_15-9-9></p></div><div class=post-footer id=post-footer><div class=post-info><div class=post-info-line><div class=post-info-mod><span>更新于 2020-05-28&nbsp;<a class=git-hash href=https://github.com/dillonzq/LoveIt/commit/bd216f23e1d418defca0218348a2196af08d9e8c target=_blank title="commit by garroshh(heng.jia@daocloud.io) bd216f23e1d418defca0218348a2196af08d9e8c: migrate blog">
+<i class="fas fa-hashtag fa-fw"></i>bd216f2</a></span></div><div class=post-info-license></div></div><div class=post-info-line><div class=post-info-md></div><div class=post-info-share><span></span></div></div></div><div class=post-info-more><section class=post-tags><i class="fas fa-tags fa-fw"></i>&nbsp;<a href=/tags/envoy/>Envoy</a>,&nbsp;<a href=/tags/%E5%AE%9E%E9%AA%8C/>实验</a></section><section><span><a href=javascript:void(0); onclick=window.history.back();>返回</a></span>&nbsp;|&nbsp;<span><a href=/>主页</a></span></section></div><div class=post-nav><a href=/hello-envoy/ class=prev rel=prev title="Hello Envoy"><i class="fas fa-angle-left fa-fw"></i>Hello Envoy</a>
+<a href=/envoy-%E5%89%8D%E7%AB%AF%E4%BB%A3%E7%90%86/ class=next rel=next title="Envoy 前端代理">Envoy 前端代理<i class="fas fa-angle-right fa-fw"></i></a></div></div><div id=comments><div id=gitalk class=comment></div><noscript>Please enable JavaScript to view the comments powered by <a href=https://github.com/gitalk/gitalk></a>Gitalk</a>.</noscript></div></article></div></main><footer class=footer><div class=footer-container><div class=footer-line>由 <a href=https://gohugo.io/ target=_blank rel="noopener noreffer" title="Hugo 0.71.1">Hugo</a> 强力驱动 | 主题 - <a href=https://github.com/dillonzq/LoveIt target=_blank rel="noopener noreffer" title="LoveIt 0.2.9"><i class="far fa-kiss-wink-heart fa-fw"></i>LoveIt</a></div><div class=footer-line><i class="far fa-copyright fa-fw"></i><span itemprop=copyrightYear>2019 - 2020</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=garroshh.me target=_blank>garroshh</a></span>&nbsp;|&nbsp;<span class=license><a rel="license external nofollow noopener noreffer" href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank>CC BY-NC 4.0</a></span></div></div></footer></div><div id=fixed-buttons><a href=# id=back-to-top class=fixed-button title=回到顶部><i class="fas fa-arrow-up fa-fw"></i></a><a href=# id=view-comments class=fixed-button title=查看评论><i class="fas fa-comment fa-fw"></i></a></div><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/gitalk@1.6.2/dist/gitalk.min.css><script type=text/javascript src=https://cdn.jsdelivr.net/npm/gitalk@1.6.2/dist/gitalk.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/smooth-scroll@16.1.3/dist/smooth-scroll.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/autocomplete.js@0.37.1/dist/autocomplete.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/algoliasearch@4.2.0/dist/algoliasearch-lite.umd.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/lazysizes@5.2.0/lazysizes.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/typeit@7.0.4/dist/typeit.min.js></script><script type=text/javascript>window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":10},"comment":{"gitalk":{"admin":["garroshh"],"clientID":"765aeb40ecd9058c4ab8","clientSecret":"824af1ecb35c665e4d7fb379211bb748841e96a1","id":"2020-05-06T10:38:06+08:00","owner":"garroshh","repo":"garroshh.github.io","title":"Envoy VS Nginx"}},"data":{"id-1":"Garroshh's Blog","id-2":"Garroshh's Blog"},"search":{"algoliaAppID":"PASDMWALPK","algoliaIndex":"index.zh-cn","algoliaSearchKey":"b42948e51daaa93df92381c8e2ac0f93","highlightTag":"em","maxResultLength":10,"noResultsFound":"没有找到结果","snippetLength":50,"type":"algolia"},"typeit":{"cursorChar":"|","cursorSpeed":1000,"data":{"id-1":["id-1"],"id-2":["id-2"]},"duration":-1,"speed":100}};</script><script type=text/javascript src=/js/theme.min.js></script></body></html>
