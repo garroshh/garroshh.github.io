@@ -7,15 +7,15 @@ tags: ["Istio", "实验"]
 categories: ["Istio"]
 ---
 
-# 1. 安装 Helm3
+## 1. 安装 Helm3
 
 ![image-20200511185817940](https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511185817940.png)
 
-# 2. 安装 Istio 1.4
+## 2. 安装 Istio 1.4
 
 ![image-20200511185835335](https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511185835335.png)
 
-# 3. 修改 Istio 参数
+## 3. 修改 Istio 参数
 
 ```bash
 vim install/kubernetes/helm/istio/values.yaml
@@ -29,7 +29,7 @@ vim install/kubernetes/helm/istio/values.yaml
 | global.proxy.disablePolicyChecks | false         | 启用策略检查功能      |
 | global.proxy.accessLogFile       | "/dev/stdout" | 获取 Envoy 的访问日志 |
 
-# 4. 修改 Istio Gateway 类型为 NodePort
+## 4. 修改 Istio Gateway 类型为 NodePort
 
 ```bash
 vim install/kubernetes/helm/istio/charts/gateways/values.yaml
@@ -37,19 +37,19 @@ vim install/kubernetes/helm/istio/charts/gateways/values.yaml
 
 ![image-20200511185852941](https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511185852941.png)
 
-# 5. 安装 Istio CRD 资源
+## 5. 安装 Istio CRD 资源
 
 ```bash
 helm install istio-init -n istio-system install/kubernetes/helm/istio-init/
 ```
 
-# 6. 安装 Istio 组件
+## 6. 安装 Istio 组件
 
 ```bash
 helm install istio -n istio-system install/kubernetes/helm/istio/
 ```
 
-# 7. 验证
+## 7. 验证
 
 ```bash
 helm list --all-namespaces

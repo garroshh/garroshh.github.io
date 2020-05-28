@@ -7,7 +7,7 @@ tags: ["Gloo", "原理"]
 categories: ["Gloo"]
 ---
 
-# 1. Gloo 简介
+## 1. Gloo 简介
 
 Gloo is a feature-rich, Kubernetes-native ingress controller, and next-generation API gateway. Gloo is uniquely designed to support hybrid applications, in which multiple technologies, architectures, protocols, and clouds can coexist.
 
@@ -19,13 +19,13 @@ Gloo is a feature-rich, Kubernetes-native ingress controller, and next-generatio
 - its numerous features;
 - its tight integration with leading open-source projects.
 
-# 2. Gloo 功能
+## 2. Gloo 功能
 
 | connect                                                      | secure                                                       | control                                                      |
 | :----------------------------------------------------------- | :----------------------------------------------------------- | :----------------------------------------------------------- |
 | All Workload TypesAuto Service DiscoveryHTTP RoutingTCP ProxygRPC WebCORSKubernetes ServicesConsul ServicesServerless FunctionsConfiguration ValidationRequest / Response TransformationService Mesh integration | 社区版：TLSHashicorp Vault SecretsLet’s EncryptCustom Authentication (DIY)企业版：Data Loss PreventionWeb App Firewall (WAF)Basic AuthenticationAPI KeyJSON Web Token (JWT)LDAP SupportOAuth / OIDCOpen Policy Agent | 社区版：Admin Dashboard (Read Only)Role DelegationAccess Logging & Usage StatsPrometheus and GrafanaTracingCircuit BreakingRetriesTimeoutsTraffic ShiftingTraffic ShadowingRate Limiting (DIY)企业版：Admin Dashboard (Full Access)Advanced Rate Limiting |
 
-# 3. Gloo 架构
+## 3. Gloo 架构
 
 ![image-20200514152732115](https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514152732115.png)
 

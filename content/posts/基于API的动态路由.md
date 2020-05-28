@@ -7,7 +7,7 @@ tags: ["Envoy", "实验"]
 categories: ["Envoy"]
 ---
 
-# 目标
+## 目标
 
 - 配置EDS
 - 使用 REST API 为集群添加端点
@@ -19,7 +19,7 @@ categories: ["Envoy"]
 
 在接下来的步骤中，我们将更改配置以使用Endpoint Discovery Service（EDS），从而允许基于来自REST-JSON API的数据来动态添加节点。
 
-# 启动 Envoy
+## 启动 Envoy
 
 envoy.yaml
 
@@ -83,7 +83,7 @@ static_resources:
 docker run --name=api-eds -d -p 80:10000 -p 9901:9901 -v /root/envoy-1.12.2/examples/api-bases-dr/:/etc/envoy envoyproxy/envoy
 ```
 
-# 启动上游服务
+## 启动上游服务
 
 ```bash
 docker run -p 8081:8081 -d -e EDS_SERVER_PORT='8081' katacoda/docker-http-server:v4
@@ -93,7 +93,7 @@ docker run -p 8081:8081 -d -e EDS_SERVER_PORT='8081' katacoda/docker-http-server
 
 ![image2019-12-30_19-44-1](https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image2019-12-30_19-44-1.png)
 
-# 启动 EDS 服务
+## 启动 EDS 服务
 
 ```bash
 docker run -p 8080:8080 -d katacoda/eds_server
@@ -127,7 +127,7 @@ curl -X POST --header 'Content-Type: application/json' --header 'Accept: applica
 
 ![image2019-12-30_19-56-35](https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image2019-12-30_19-56-35.png)
 
-# 为集群添加新的端点
+## 为集群添加新的端点
 
 ```bash
 for i in 8082 8083 8084 8085
@@ -201,7 +201,7 @@ while true; do curl http://localhost; sleep .5; printf '\n'; done
 
 ![image2019-12-30_20-7-42](https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image2019-12-30_20-7-42.png)
 
-# 删除端点
+## 删除端点
 
 ```bash
 curl -X PUT --header 'Content-Type: application/json' --header 'Accept: application/json' -d '{
@@ -211,7 +211,7 @@ curl -X PUT --header 'Content-Type: application/json' --header 'Accept: applicat
 
 ![image2019-12-30_20-9-49](https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image2019-12-30_20-9-49.png)
 
-# 断联 EDS 服务
+## 断联 EDS 服务
 
 重新注册
 

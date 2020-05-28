@@ -7,13 +7,13 @@ tags: ["Envoy", "实验"]
 categories: ["Envoy"]
 ---
 
-# 目标
+## 目标
 
 - 配置Envoy代理转发流量到外部网址
 
 - 通过控制流量目的地址，演示基于路径的路由
 
-# 准备 Envoy 的配置文件
+## 准备 Envoy 的配置文件
 
 如下所示，文件名 baidu_com_proxy.v2.yaml。
 
@@ -75,7 +75,7 @@ static_resources: #静态API配置
         sni: www.baidu.com
 ```
 
-# 启动 Envoy
+## 启动 Envoy
 
 挂载配置文件 baidu_com_proxy.v2.yaml 到 /etc/envoy/envoy.yaml。
 
@@ -83,7 +83,7 @@ static_resources: #静态API配置
 docker run --name=proxy-with-admin -d -p 9901:9901 -p 10000:10000 -v $(pwd)/baidu_com_proxy.v2.yaml:/etc/envoy/envoy.yaml envoyproxy/envoy:latest
 ```
 
-# 测试
+## 测试
 
 - curl localhost:10000
 

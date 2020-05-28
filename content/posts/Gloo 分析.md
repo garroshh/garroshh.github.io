@@ -9,7 +9,7 @@ categories: ["Gloo"]
 
 以下为个人理解，仅供参考！
 
-# Gloo Envoy Upgrades
+## Gloo Envoy Upgrades
 
 As we ship an extended version of Envoy, it is very important for us to stay close to upstream Envoy. To achieve this, our repository structure and CI closely resembles those of Envoy.
 
@@ -21,7 +21,7 @@ Envoy master branch is always considered RC quality. We therefore make sure freq
 
 
 
-# servless 支持
+## servless 支持
 
 ![image-20200514152341972](https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514152341972.png)
 
@@ -35,7 +35,7 @@ In order to achieve Knative scale-from-zero, we use a Mixer [out-of-process adap
 
 
 
-# Api 组合
+## Api 组合
 
 Sqoop (formerly QLoo) is a GraphQL Server built on top of Gloo and the Envoy Proxy.
 
@@ -49,7 +49,7 @@ Istio 暂无，也不会有，关注点不一样，是东西流量。
 
 
 
-# 灰度发布
+## 灰度发布
 
 Istio 做法：哪一个服务要灰度，写哪一个服务的 VirtualService，个人觉得，灰度的配置管理，当前和流控，路由等的配置都集中在了目的服务的vs配置里，不便于管理。另一方面，服务多了之后，因为是为目标服务来做配置，这些配置文件如何管理。如下的这些灰度规则，个人
 

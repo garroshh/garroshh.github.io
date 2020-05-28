@@ -7,7 +7,7 @@ tags: ["Istio", "实验"]
 categories: ["Istio"]
 ---
 
-# 三种方式
+## 三种方式
 
 1.Quick Start
 
@@ -21,7 +21,7 @@ categories: ["Istio"]
 
 3.Helm template
 
-# 使用 helm template 进行安装
+## 使用 helm template 进行安装
 
 Helm Tiller 或 Helm template 差别不大，这里选择Helm template 方式。
 
@@ -61,7 +61,7 @@ $ kubectl apply -f install/kubernetes/helm/istio/istio.yaml
 
 注：后续所有文章当前所处目录都为解压istio-1.3.4.tar.gz后的根目录，就不再注明
 
-# 验证安装
+## 验证安装
 
 确认 Istio Kubernetes services 服务是否正常，确保部署了相应的 Kubernetes pod 并且 STATUS 是 Running
 
@@ -71,7 +71,7 @@ $ kubectl get svc -n istio-system
 $ kubectl get po -n istio-system
 ```
 
-# 卸载
+## 卸载
 
 ```bash
 $ kubectl delete -f install/kubernetes/helm/istio/istio.yaml
@@ -81,7 +81,7 @@ $ kubectl delete ns istio-system
 $ kubectl delete -f install/kubernetes/helm/istio-init/files
 ```
 
-# 趟过的坑:
+## 趟过的坑:
 
 1.对于二进制方式部署的kubernetes集群，kube-apiserver 的准入控制参数，需添加MutatingAdmissionWebhook,ValidatingAdmissionWebhook 这两个webhook。
 

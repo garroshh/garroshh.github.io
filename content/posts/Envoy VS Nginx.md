@@ -7,11 +7,11 @@ tags: ["Envoy", "实验"]
 categories: ["Envoy"]
 ---
 
-# 目标
+## 目标
 
 对比Envoy 和 Nginx 配置
 
-# Nginx配置
+## Nginx配置
 
 Nginx 配置三要素：
 
@@ -68,7 +68,7 @@ http {
 }
 ```
 
-# Envoy 配置
+## Envoy 配置
 
 Envoy 配置四要素：
 
@@ -126,7 +126,7 @@ static_resources: #静态API配置
     ]
 ```
 
-# 测试：通过 Envoy 流量转发，轮询的负载均衡到后端两个服务
+## 测试：通过 Envoy 流量转发，轮询的负载均衡到后端两个服务
 
 按照如上Envoy配置，启动 Envoy 容器。后端两个服务未启动时，返回503，属于正常现象。
 

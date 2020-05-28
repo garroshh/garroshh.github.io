@@ -7,20 +7,20 @@ tags: ["Envoy", "实验"]
 categories: ["Envoy"]
 ---
 
-# 目标
+## 目标
 
 - 暴露 Envoy 的 Metrics 到 Prometheus
 - 使用 Prometheus 数据源在 Grafana 展示
 - 配置 Envoy 发送 traces 到 Jaeger
 
-# 启动上游服务
+## 启动上游服务
 
 ```bash
 docker run -d katacoda/docker-http-server:healthy
 docker run -d katacoda/docker-http-server:healthy
 ```
 
-# 启动 Envoy
+## 启动 Envoy
 
 ```yaml
 admin:

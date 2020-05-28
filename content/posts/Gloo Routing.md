@@ -13,7 +13,7 @@ categories: ["Gloo"]
 
 上游代表那些后端。网关对象可帮助我们控制侦听器的传入流量。
 
-# 1. 部署 Pet Store
+## 1. 部署 Pet Store
 
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/solo-io/gloo/v1.2.9/example/petstore/petstore.yaml
@@ -31,7 +31,7 @@ Upstream STATUS 为 Accepted。
 
 ![image-20200514143403050](https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514143403050.png)
 
-# 2. 标记命名空间
+## 2. 标记命名空间
 
 查看 upstream yaml
 
@@ -49,7 +49,7 @@ kubectl label namespace default discovery.solo.io/function_discovery=enabled
 
 ![image-20200514143452411](https://cdn.jsdelivr.net/gh/garroshh/figurebed/2020/image-20200514143452411.png)
 
-# 3. 配置路由
+## 3. 配置路由
 
 即使已创建上游，在我们向虚拟服务添加一些路由规则之前，Gloo仍不会将流量路由到该路由。现在，我们使用glooctl通过--prefix-rewrite标志为此上游创建一条基本路由，以在传入请求中重写路径以匹配我们的petstore应用程序期望的路径。
 
@@ -79,7 +79,7 @@ glooctl get virtualservice --output kube-yaml
 
 至此，我们有了一个带有路由规则的虚拟服务，该路由规则将/ all-pets路径上的流量发送到/ api / pets路径上的上游petstore。
 
-# 4. 测试
+## 4. 测试
 
 ```shell
 curl $(glooctl proxy url)/all-pets

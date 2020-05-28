@@ -28,11 +28,11 @@ reviews 微服务有 3 个版本：
 
 Bookinfo 是一个异构应用，几个微服务是由不同的语言编写的。这些服务对 Istio 并无依赖，但是构成了一个有代表性的服务网格的例子：它由多个服务、多个语言构成，并且 reviews 服务具有多个版本。
 
-### 开始之前
+## 开始之前
 
 如果还没开始，首先要遵循 [Istio安装](https://dwiki.daocloud.io/pages/viewpage.action?pageId=45449653) 的指导，根据所在平台完成 Istio 的部署工作。
 
-### 部署应用
+## 部署应用
 
 要在 Istio 中运行这一应用，无需对应用自身做出任何改变。我们只要简单的在 Istio 环境中对服务进行配置和运行，具体一点说就是把 Envoy sidecar 注入到每个服务之中。这个过程所需的具体命令和配置方法由运行时环境决定，而部署结果较为一致，如下图所示：
 
@@ -40,7 +40,7 @@ Bookinfo 是一个异构应用，几个微服务是由不同的语言编写的�
 
 所有的微服务都和 Envoy sidecar 集成在一起，被集成服务所有的出入流量都被 sidecar 所劫持，这样就为外部控制准备了所需的 Hook，然后就可以利用 Istio 控制平面为应用提供服务路由、遥测数据收集以及策略实施等功能。
 
-### 如果在 Kubernetes 中运行
+## 如果在 Kubernetes 中运行
 
 1.进入 Istio 安装目录。
 
@@ -79,7 +79,7 @@ $ kubectl get pods
 $ kubectl exec -it $(kubectl get pod -l app=ratings -o jsonpath='{.items[0].metadata.name}') -c ratings -- curl productpage:9080/productpage | grep -o "<title>.*</title>"
 ```
 
-#### 确定 Ingress 的 IP 和端口
+## 确定 Ingress 的 IP 和端口
 
 现在 Bookinfo 服务启动并运行中，你需要使应用程序可以从外部访问 Kubernetes 集群，例如使用浏览器。一个 Istio Gateway 应用到了目标中。
 
@@ -99,7 +99,7 @@ $ kubectl get gateway
 
 http://172.16.99.181:8500/productpage
 
-### 确认应用在运行中
+## 确认应用在运行中
 
 可以用 curl 命令来确认 Bookinfo 应用的运行情况：
 
@@ -109,7 +109,7 @@ $ curl -s http://${GATEWAY_URL}/productpage | grep -o "<title>.*</title>"
 
 还可以用浏览器打开网址 http://$GATEWAY_URL/productpage，来浏览应用的 Web 页面。如果刷新几次应用的页面，就会看到 productpage 页面中会随机展示 reviewe 服务的不同版本的效果（红色、黑色的星形或者没有显示）。reviews 服务出现这种情况是因为我们还没有使用 Istio 来控制版本的路由。
 
-### 清理
+## 清理
 
 结束对 Bookinfo 示例应用的体验之后，就可以使用下面的命令来完成应用的删除和清理了。
 

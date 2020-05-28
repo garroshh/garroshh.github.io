@@ -7,7 +7,7 @@ tags: ["Istio", "实验"]
 categories: ["Istio"]
 ---
 
-# 1. 机器配置
+## 1. 机器配置
 
 | OS                      | 主机名 | 配置 | ip          |
 | :---------------------- | :----- | :--- | :---------- |
@@ -15,7 +15,7 @@ categories: ["Istio"]
 | Centos7(Docker 19.03.5) | w-101  | 4C8G | 10.12.1.101 |
 | Centos7(Docker 19.03.5) | w-102  | 4C8G | 10.12.1.102 |
 
-# 2. 主节点和工作节点配置
+## 2. 主节点和工作节点配置
 
 ### 安装 kubeadm, kubelet 和 kubectl，其中 kubectl 工作节点可选择性安装
 
@@ -196,7 +196,7 @@ kubectl taint nodes --all node-role.kubernetes.io/master-
 
 ![image-20200511184458185](https://cdn.jsdelivr.net/gh/garroshh/figurebed/img/image-20200511184458185.png)
 
-# 3. 工作节点配置
+## 3. 工作节点配置
 
 ### 添加工作节点
 

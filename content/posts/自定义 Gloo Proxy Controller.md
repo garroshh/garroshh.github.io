@@ -9,7 +9,7 @@ categories: ["Gloo"]
 
 使用 Gloo [Proxy API ](https://docs.solo.io/gloo/latest/reference/api/github.com/solo-io/gloo/projects/gloo/api/v1/proxy.proto.sk/#proxy)自动为存在的 kubernetes 服务创建路由器。
 
-# 1. 为什么编写自定义代理控制器？
+## 1. 为什么编写自定义代理控制器？
 
 Building a Proxy controller allows you to add custom Gloo operational logic to your setup. In this example, we will write a proxy controller that creates and manages a second Gloo Proxy (my-cool-proxy) alongside the Gloo-managed one (gateway-proxy). The my-cool-proxy envoy proxy will route to Gloo-discovered kubernetes services using the host header alone, relieving the Gloo admin from creating virtual services or route tables to route to each discovered service.
 
@@ -18,13 +18,13 @@ Other common use cases that can be solved with custom proxy controllers include:
 - automatically creating http routes that redirect to equivalent https routes
 - automatically routing to services based on service name and removing the service name prefix from the request path
 
-# 2. 工作原理
+## 2. 工作原理
 
 A custom Proxy controller takes any inputs (in our case, Gloo custom resources in kubernetes) and writes the desired output to managed Proxy custom resource(s).
 
 In our case, we will write a controller that takes Upstreams and Proxys as inputs and outputs a new Proxy. Then we will deploy the new controller to create and manage our new my-cool-proxy Proxy custom resource. Finally, we will deploy a second envoy proxy to kubernetes, have it register to Gloo with its role configured to match the name of our managed Proxy custom resource (my-cool-proxy), and configure it to receive configuration from Gloo.
 
-# 3. 编码步骤
+## 3. 编码步骤
 
 前置准备
 
@@ -115,7 +115,7 @@ func must(err error) {
 }
 ```
 
-## 3.2. Gloo API Clients
+### 3.2. Gloo API Clients
 
 ```go
 func initGlooClients(ctx context.Context) (v1.UpstreamClient, v1.ProxyClient) {
@@ -158,7 +158,7 @@ func initGlooClients(ctx context.Context) (v1.UpstreamClient, v1.ProxyClient) {
 }
 ```
 
-## 3.3. Proxy Configuration
+### 3.3. Proxy Configuration
 
 ```go
 // in this function we'll generate an opinionated
@@ -245,7 +245,7 @@ func makeDesiredProxy(upstreams v1.UpstreamList) *v1.Proxy {
 }
 ```
 
-## 3.4. Event Loop
+### 3.4. Event Loop
 
 ```go
 // we received a new list of upstreams! regenerate the desired proxy
@@ -286,7 +286,7 @@ func resync(ctx context.Context, upstreams v1.UpstreamList, client v1.ProxyClien
 }
 ```
 
-## 3.5. Main Function
+### 3.5. Main Function
 
 ```go
 func main() {
@@ -317,13 +317,13 @@ func main() {
 }
 ```
 
-## 3.6. Run
+### 3.6. Run
 
 ```shell
 go run example/proxycontroller/proxycontroller.go
 ```
 
-## 3.7. Test
+### 3.7. Test
 
 ```shell
 curl $(glooctl proxy url -n default --name my-cool-proxy)/api/pets -H "Host: default-petstore-8080"
