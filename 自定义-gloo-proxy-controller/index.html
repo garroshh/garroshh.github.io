@@ -6,7 +6,7 @@
 <i class="fas fa-adjust fa-fw"></i></a><a href=javascript:void(0); class=menu-item title=选择语言>简体中文<i class="fas fa-chevron-right fa-fw"></i>
 <select class=language-select onchange="location=this.value;"><option value=/%E8%87%AA%E5%AE%9A%E4%B9%89-gloo-proxy-controller/ selected>简体中文</option></select></a></div></div></header><div class="search-dropdown desktop"><div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile"><div id=search-dropdown-mobile></div></div><main class=main><div class=container><div class=toc id=toc-auto><h2 class=toc-title>目录</h2><div class=toc-content id=toc-content-auto></div></div><article class="page single"><h1 class="single-title animated flipInX">自定义 Gloo Proxy Controller</h1><div class=post-meta><div class=post-meta-line><span class=post-author><a href=garroshh.me title=Author rel=author class=author><i class="fas fa-user-circle fa-fw"></i>garroshh</a></span>&nbsp;<span class=post-category>收录于 <a href=/categories/gloo/><i class="far fa-folder fa-fw"></i>Gloo</a></span></div><div class=post-meta-line><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime=2020-05-14>2020-05-14</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 1440 字&nbsp;
 <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 3 分钟&nbsp;</div></div><div class="details toc" id=toc-static kept><div class="details-summary toc-title"><span>目录</span>
-<span><i class="details-icon fas fa-angle-right"></i></span></div><div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents><ul><li><a href=#32-gloo-api-clients>3.2. Gloo API Clients</a></li><li><a href=#33-proxy-configuration>3.3. Proxy Configuration</a></li><li><a href=#34-event-loop>3.4. Event Loop</a></li><li><a href=#35-main-function>3.5. Main Function</a></li><li><a href=#36-run>3.6. Run</a></li><li><a href=#37-test>3.7. Test</a></li></ul></nav></div></div><div class=content id=content><p>使用 Gloo <a href=https://docs.solo.io/gloo/latest/reference/api/github.com/solo-io/gloo/projects/gloo/api/v1/proxy.proto.sk/#proxy target=_blank rel="noopener noreffer">Proxy API </a>自动为存在的 kubernetes 服务创建路由器。</p><h1 id=1-为什么编写自定义代理控制器>1. 为什么编写自定义代理控制器？</h1><p>Building a Proxy controller allows you to add custom Gloo operational logic to your setup. In this example, we will write a proxy controller that creates and manages a second Gloo Proxy (my-cool-proxy) alongside the Gloo-managed one (gateway-proxy). The my-cool-proxy envoy proxy will route to Gloo-discovered kubernetes services using the host header alone, relieving the Gloo admin from creating virtual services or route tables to route to each discovered service.</p><p>Other common use cases that can be solved with custom proxy controllers include:</p><ul><li>automatically creating http routes that redirect to equivalent https routes</li><li>automatically routing to services based on service name and removing the service name prefix from the request path</li></ul><h1 id=2-工作原理>2. 工作原理</h1><p>A custom Proxy controller takes any inputs (in our case, Gloo custom resources in kubernetes) and writes the desired output to managed Proxy custom resource(s).</p><p>In our case, we will write a controller that takes Upstreams and Proxys as inputs and outputs a new Proxy. Then we will deploy the new controller to create and manage our new my-cool-proxy Proxy custom resource. Finally, we will deploy a second envoy proxy to kubernetes, have it register to Gloo with its role configured to match the name of our managed Proxy custom resource (my-cool-proxy), and configure it to receive configuration from Gloo.</p><h1 id=3-编码步骤>3. 编码步骤</h1><p>前置准备</p><p>依赖</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+<span><i class="details-icon fas fa-angle-right"></i></span></div><div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents><ul><li><a href=#1-为什么编写自定义代理控制器>1. 为什么编写自定义代理控制器？</a></li><li><a href=#2-工作原理>2. 工作原理</a></li><li><a href=#3-编码步骤>3. 编码步骤</a><ul><li><a href=#32-gloo-api-clients>3.2. Gloo API Clients</a></li><li><a href=#33-proxy-configuration>3.3. Proxy Configuration</a></li><li><a href=#34-event-loop>3.4. Event Loop</a></li><li><a href=#35-main-function>3.5. Main Function</a></li><li><a href=#36-run>3.6. Run</a></li><li><a href=#37-test>3.7. Test</a></li></ul></li></ul></nav></div></div><div class=content id=content><p>使用 Gloo <a href=https://docs.solo.io/gloo/latest/reference/api/github.com/solo-io/gloo/projects/gloo/api/v1/proxy.proto.sk/#proxy target=_blank rel="noopener noreffer">Proxy API </a>自动为存在的 kubernetes 服务创建路由器。</p><h2 id=1-为什么编写自定义代理控制器>1. 为什么编写自定义代理控制器？</h2><p>Building a Proxy controller allows you to add custom Gloo operational logic to your setup. In this example, we will write a proxy controller that creates and manages a second Gloo Proxy (my-cool-proxy) alongside the Gloo-managed one (gateway-proxy). The my-cool-proxy envoy proxy will route to Gloo-discovered kubernetes services using the host header alone, relieving the Gloo admin from creating virtual services or route tables to route to each discovered service.</p><p>Other common use cases that can be solved with custom proxy controllers include:</p><ul><li>automatically creating http routes that redirect to equivalent https routes</li><li>automatically routing to services based on service name and removing the service name prefix from the request path</li></ul><h2 id=2-工作原理>2. 工作原理</h2><p>A custom Proxy controller takes any inputs (in our case, Gloo custom resources in kubernetes) and writes the desired output to managed Proxy custom resource(s).</p><p>In our case, we will write a controller that takes Upstreams and Proxys as inputs and outputs a new Proxy. Then we will deploy the new controller to create and manage our new my-cool-proxy Proxy custom resource. Finally, we will deploy a second envoy proxy to kubernetes, have it register to Gloo with its role configured to match the name of our managed Proxy custom resource (my-cool-proxy), and configure it to receive configuration from Gloo.</p><h2 id=3-编码步骤>3. 编码步骤</h2><p>前置准备</p><p>依赖</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -160,7 +160,7 @@
         <span class=nb>panic</span><span class=p>(</span><span class=nx>err</span><span class=p>)</span>
     <span class=p>}</span>
 <span class=p>}</span>
-</code></pre></td></tr></table></div></div><h2 id=32-gloo-api-clients>3.2. Gloo API Clients</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</code></pre></td></tr></table></div></div><h3 id=32-gloo-api-clients>3.2. Gloo API Clients</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -236,7 +236,7 @@
  
     <span class=k>return</span> <span class=nx>upstreamClient</span><span class=p>,</span> <span class=nx>proxyClient</span>
 <span class=p>}</span>
-</code></pre></td></tr></table></div></div><h2 id=33-proxy-configuration>3.3. Proxy Configuration</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</code></pre></td></tr></table></div></div><h3 id=33-proxy-configuration>3.3. Proxy Configuration</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -400,7 +400,7 @@
  
     <span class=k>return</span> <span class=nx>desiredProxy</span>
 <span class=p>}</span>
-</code></pre></td></tr></table></div></div><h2 id=34-event-loop>3.4. Event Loop</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</code></pre></td></tr></table></div></div><h3 id=34-event-loop>3.4. Event Loop</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -472,7 +472,7 @@
  
     <span class=nx>log</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span><span class=s>&#34;wrote proxy object: %+v\n&#34;</span><span class=p>,</span> <span class=nx>written</span><span class=p>)</span>
 <span class=p>}</span>
-</code></pre></td></tr></table></div></div><h2 id=35-main-function>3.5. Main Function</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</code></pre></td></tr></table></div></div><h3 id=35-main-function>3.5. Main Function</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -524,9 +524,9 @@
         <span class=p>}</span>
     <span class=p>}</span>
 <span class=p>}</span>
-</code></pre></td></tr></table></div></div><h2 id=36-run>3.6. Run</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</code></pre></td></tr></table></div></div><h3 id=36-run>3.6. Run</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
 </span></code></pre></td><td class=lntd><pre class=chroma><code class=language-shell data-lang=shell>go run example/proxycontroller/proxycontroller.go
-</code></pre></td></tr></table></div></div><h2 id=37-test>3.7. Test</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</code></pre></td></tr></table></div></div><h3 id=37-test>3.7. Test</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
 </span></code></pre></td><td class=lntd><pre class=chroma><code class=language-shell data-lang=shell>curl <span class=k>$(</span>glooctl proxy url -n default --name my-cool-proxy<span class=k>)</span>/api/pets -H <span class=s2>&#34;Host: default-petstore-8080&#34;</span>
 </code></pre></td></tr></table></div></div><p>returns</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
 </span></code></pre></td><td class=lntd><pre class=chroma><code class=language-shell data-lang=shell><span class=o>[{</span><span class=s2>&#34;id&#34;</span>:1,<span class=s2>&#34;name&#34;</span>:<span class=s2>&#34;Dog&#34;</span>,<span class=s2>&#34;status&#34;</span>:<span class=s2>&#34;available&#34;</span><span class=o>}</span>,<span class=o>{</span><span class=s2>&#34;id&#34;</span>:2,<span class=s2>&#34;name&#34;</span>:<span class=s2>&#34;Cat&#34;</span>,<span class=s2>&#34;status&#34;</span>:<span class=s2>&#34;pending&#34;</span><span class=o>}]</span>
